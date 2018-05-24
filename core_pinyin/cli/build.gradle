@@ -1,0 +1,38 @@
+
+subprojects {
+  apply plugin: 'com.github.johnrengelman.shadow'
+  apply plugin: 'application'
+
+  dependencies {
+    compile project(':core_lib')
+    compile project(':cli_lib')
+  }
+}
+
+project('cli_core_freq') {
+  mainClassName = 'org.sceext.a_pinyin.core_freq.CoreTestCliKt'
+}
+
+project('cli_pinyin_cut')  {
+  mainClassName = 'org.sceext.a_pinyin.core_pinyin_cut.CoreTestCliKt'
+}
+
+project('cli_core_hmm') {
+  mainClassName = 'org.sceext.a_pinyin.core_hmm.CoreTestCliKt'
+}
+
+project('cli_core_dict') {
+  mainClassName = 'org.sceext.a_pinyin.core_dict.CoreTestCliKt'
+
+  dependencies {
+    compile 'org.xerial:sqlite-jdbc:3.21.0.1'
+  }
+}
+
+project('cli_core_mix') {
+  mainClassName = 'org.sceext.a_pinyin.core_mix.CoreTestCliKt'
+
+  dependencies {
+    compile 'org.xerial:sqlite-jdbc:3.21.0.1'
+  }
+}

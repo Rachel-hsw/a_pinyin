@@ -1,0 +1,10 @@
+rootProject.name = 'core_pinyin'
+
+include ':core_lib'
+include ':cli_lib'
+
+include ':cli:cli_core_freq'
+include ':cli:cli_pinyin_cut'
+include ':cli:cli_core_hmm'
+include ':cli:cli_core_dict'
+include ':cli:cli_core_mix'

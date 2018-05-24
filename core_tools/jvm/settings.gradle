@@ -1,0 +1,8 @@
+rootProject.name = 'core_tools'
+
+include ':tool_lib'
+
+include ':cli:hmm_args'
+include ':cli:pinyin_cut_mm'
+include ':cli:word_seg'
+include ':cli:word_count'

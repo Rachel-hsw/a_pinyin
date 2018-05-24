@@ -1,0 +1,14 @@
+<input-method xmlns:android="http://schemas.androidcom/apk/res/android"
+  android:settingsActivity="org.sceext.a_pinyin.MainActivity"
+  android:icon="@mipmap/ic_launcher" >
+  <!--
+  <subtype android:name="@string/app_name"
+    android:icon="@mipmap/ic_launcher"
+    android:imeSubtypeLanguage="en_US"
+    android:imeSubtypeMode="keyboard" />
+  <subtype android:name="@string/app_name"
+    android:icon="@mipmap/ic_launcher"
+    android:imeSubtypeLanguage="zh_CN"
+    android:imeSubtypeMode="keyboard" />
+  -->
+</input-method>

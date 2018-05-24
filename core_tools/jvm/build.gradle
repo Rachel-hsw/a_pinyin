@@ -1,0 +1,67 @@
+
+// add kotlin support
+buildscript {
+  ext.kotlin_version = '1.2.41'
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.3'
+  }
+}
+
+subprojects {
+  apply plugin: 'kotlin'
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    compile fileTree(dir: "${rootProject.projectDir}/libs", include: ["*.jar"])
+
+    compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    compile 'com.beust:klaxon:3.0.3'
+    compile 'com.esotericsoftware:kryo:4.0.2'
+    compile 'org.xerial:sqlite-jdbc:3.21.0.1'
+
+    testCompile 'org.jetbrains.kotlin:kotlin-test'
+    testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
+  }
+}
+
+project(':cli') {
+  subprojects {
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'application'
+
+    dependencies {
+      compile project(':tool_lib')
+    }
+  }
+}
+
+project(':cli:hmm_args') {
+  mainClassName = 'org.sceext.a_pinyin.tool_hmm_args.MainKt'
+}
+
+project(':cli:pinyin_cut_mm') {
+  mainClassName = 'org.sceext.a_pinyin.tool_pinyin_cut_mm.MainKt'
+}
+
+project(':cli:word_seg') {
+  mainClassName = 'org.sceext.a_pinyin.tool_word_seg.MainKt'
+
+  shadowJar {
+    from "../../libs/hanlp.properties"
+  }
+}
+
+project(':cli:word_count') {
+  mainClassName = 'org.sceext.a_pinyin.tool_word_count.MainKt'
+}

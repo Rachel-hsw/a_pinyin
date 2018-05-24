@@ -1,0 +1,33 @@
+
+// add kotlin support
+buildscript {
+  ext.kotlin_version = '1.2.41'
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.3'
+  }
+}
+
+subprojects {
+  apply plugin: 'kotlin'
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    compile 'com.beust:klaxon:3.0.3'
+    compile 'com.esotericsoftware:kryo:4.0.2'
+
+    testCompile 'org.jetbrains.kotlin:kotlin-test'
+    testCompile 'org.jetbrains.kotlin:kotlin-test-junit'
+  }
+}
