@@ -1,6 +1,6 @@
 # config.coffee, a_pinyin/apk/src/
 
-P_VERSION = 'a_pinyin version 1.0.0 test20180525 0150'
+P_VERSION = 'a_pinyin version 1.1.0 test20180601 0028'
 
 # for delete key, multi-delete function
 DELETE_KEY_DELAY_FIRST = 300  # 300ms before first delete
@@ -15,6 +15,15 @@ SYMBOL2_N = 16  # 16 symbol2 in last_used
 TOP_PINYIN_LIST_NUM = 7  # 7 items at most
 PINYIN_MORE_PER_LINE = 6
 
+DB_CORE_DATA = '/sdcard/a_pinyin/core/core_data.db'
+DB_USER_DATA = '/sdcard/a_pinyin/user/user_data.db'
+
+DB_REMOTE_URL = {
+  'core_data.db': 'https://coding.net/u/sceext2133/p/a_pinyin/git/raw/db/1.0.0/core_data.db'
+  'user_data.db': 'https://coding.net/u/sceext2133/p/a_pinyin/git/raw/db/1.0.0/user_data.db'
+}
+DB_TMP_DIR = '/sdcard/a_pinyin/tmp'
+DB_TMP_SUFFIX = '.tmp'
 
 module.exports = {
   P_VERSION
@@ -29,6 +38,13 @@ module.exports = {
 
   TOP_PINYIN_LIST_NUM
   PINYIN_MORE_PER_LINE
+
+  DB_CORE_DATA
+  DB_USER_DATA
+
+  DB_REMOTE_URL
+  DB_TMP_DIR
+  DB_TMP_SUFFIX
 
   # the redux global store
   store: null

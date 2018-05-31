@@ -1,5 +1,9 @@
 # op.coffee, a_pinyin/apk/src/redux/
 
+path = require 'path'
+
+{ default: RNFetchBlob } = require 'react-native-fetch-blob'
+
 action = require './action'
 util = require '../util'
 
@@ -256,6 +260,101 @@ _merge_list = (raw) ->
         d[j] = true
   o
 
+# database
+
+check_db = ->
+  (dispatch, getState) ->
+    ok = true
+    # check core_data.db
+    if await RNFetchBlob.fs.exists(config.DB_CORE_DATA)
+      DB_NAME = 'core_data.db'
+      stat = await RNFetchBlob.fs.stat(config.DB_CORE_DATA)
+      o = {
+        db_path: {}
+        db_size: {}
+      }
+      o.db_path[DB_NAME] = config.DB_CORE_DATA
+      o.db_size[DB_NAME] = stat.size
+      dispatch action.db_set_info(o)
+    else
+      ok = false
+    # check user_data.db
+    if await RNFetchBlob.fs.exists(config.DB_USER_DATA)
+      DB_NAME = 'user_data.db'
+      stat = await RNFetchBlob.fs.stat(config.DB_USER_DATA)
+      o = {
+        db_path: {}
+        db_size: {}
+      }
+      o.db_path[DB_NAME] = config.DB_USER_DATA
+      o.db_size[DB_NAME] = stat.size
+      dispatch action.db_set_info(o)
+    else
+      ok = false
+    # TODO invoke im_native to check db content (version ?)
+    dispatch action.db_set_info({
+      ok
+    })
+
+dl_db = ->
+  (dispatch, getState) ->
+    dispatch action.db_set_info({
+      dling: true
+    })
+    try
+      await dispatch _dl_db()
+      await dispatch check_db()
+    catch e
+      # TODO error process ?
+    dispatch action.db_set_info({
+      dling: false
+    })
+
+_dl_db = ->
+  (dispatch, getState) ->
+    # core_data.db
+    if ! await RNFetchBlob.fs.exists(config.DB_CORE_DATA)
+      await _dl_one_db config.DB_CORE_DATA, config.DB_REMOTE_URL['core_data.db'], ' core_data.db A拼音 核心数据库'
+    # user_data.db
+    if ! await RNFetchBlob.fs.exists(config.DB_USER_DATA)
+      await _dl_one_db config.DB_USER_DATA, config.DB_REMOTE_URL['user_data.db'], ' user_data.db A拼音 用户数据库'
+
+_ensure_parent_dir = (p) ->
+  parent = path.dirname(p)
+  # ensure parent first
+  if ! await RNFetchBlob.fs.isDir(parent)
+    await _ensure_parent_dir parent
+  # check and create this
+  if ! await RNFetchBlob.fs.isDir(p)
+    await RNFetchBlob.fs.mkdir(p)
+
+_dl_one_db = (local_file, url, description) ->
+  # check and create tmp dir
+  await _ensure_parent_dir(config.DB_TMP_DIR)
+  # use Android download manager to download the database file
+  o = RNFetchBlob.config({
+    addAndroidDownloads: {
+      useDownloadManager: true
+      notification: true
+      mime: '*/*'
+      title: description
+      description
+      path: path.join RNFetchBlob.fs.dirs.DownloadDir, path.basename(local_file)
+    }
+  })
+  res = await o.fetch 'GET', url
+  p = res.path()
+  # check and create db dir
+  await _ensure_parent_dir path.dirname(local_file)
+  # write-replace the db file
+  tmp_file = local_file + config.DB_TMP_SUFFIX
+  await RNFetchBlob.fs.cp p, tmp_file  # write
+  await RNFetchBlob.fs.mv tmp_file, local_file  # replace
+  # try to delete download file, ignore error
+  try
+    await RNFetchBlob.fs.unlink p
+  catch e
+    # TODO ignore error
 
 module.exports = {
   close_window  # thunk
@@ -278,4 +377,7 @@ module.exports = {
 
   load_user_symbol  # thunk
   load_user_symbol2  # thunk
+
+  check_db  # thunk
+  dl_db  # thunk
 }

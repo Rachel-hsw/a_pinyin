@@ -34,6 +34,20 @@ init_state = {
     symbol: []
     symbol2: []
   }
+
+  # database status
+  db: {
+    ok: null  # is database OK
+    db_path: {
+      'core_data.db': null
+      'user_data.db': null
+    }
+    db_size: {
+      'core_data.db': -1
+      'user_data.db': -1
+    }
+    dling: false  # doing db download
+  }
 }
 
 module.exports = init_state

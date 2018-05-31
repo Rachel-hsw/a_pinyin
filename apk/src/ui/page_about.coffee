@@ -54,6 +54,7 @@ PageAbout = cC {
       } },
       # name and page url
       (cE Text, {
+        selectable: true
         style: {
           fontSize: ss.TITLE_SIZE
           color: @props.co.TEXT
@@ -62,6 +63,7 @@ PageAbout = cC {
         "A拼音: 开源的 Android 拼音输入法"
       )
       (cE Text, {
+        selectable: true
         style: {
           fontSize: ss.TEXT_SIZE
           color: @props.co.TEXT_SEC
@@ -70,6 +72,7 @@ PageAbout = cC {
         config.P_VERSION
       )
       (cE Text, {
+        selectable: true
         style: {
           fontSize: ss.TEXT_SIZE
           color: @props.co.TEXT_SEC
@@ -91,6 +94,7 @@ PageAbout = cC {
         horizontal: true
         },
         (cE Text, {
+          selectable: true
           style: {
             fontSize: ss.TEXT_SIZE
             color: @props.co.TEXT

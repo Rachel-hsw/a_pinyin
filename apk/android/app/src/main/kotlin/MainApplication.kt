@@ -11,6 +11,8 @@ import com.facebook.react.ReactPackage
 import com.facebook.react.shell.MainReactPackage
 import com.facebook.soloader.SoLoader
 
+import com.RNFetchBlob.RNFetchBlobPackage
+
 
 // save MainApplication instance
 var _app_context: MainApplication? = null
@@ -28,6 +30,7 @@ class MainApplication : Application(), ReactApplication {
         override fun getPackages(): List<ReactPackage> {
             return Arrays.asList(
                 MainReactPackage(),
+                RNFetchBlobPackage(),
                 ImPackage()
             )
         }

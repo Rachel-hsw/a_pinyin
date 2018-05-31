@@ -28,9 +28,11 @@ PageMain = cC {
 
   propTypes: {
     co: PropTypes.object.isRequired
+    db_ok: PropTypes.bool
 
     on_show_debug: PropTypes.func.isRequired
     on_show_about: PropTypes.func.isRequired
+    on_show_db: PropTypes.func.isRequired
   }
 
   _render_main_logo: ->
@@ -43,12 +45,21 @@ PageMain = cC {
       } })
 
   _render_about_button: ->
+    @_render_one_button '关于', @props.on_show_about, ''
+
+  _render_db_button: ->
+    sec = ''
+    if @props.db_ok is false
+      sec = '错误 !'
+    @_render_one_button '数据库', @props.on_show_db, sec
+
+  _render_one_button: (text, on_click, sec) ->
     (cE View, {
       style: {
         height: ss.TOP_HEIGHT
       } },
       (cE TouchableNativeFeedback, {
-        onPress: @props.on_show_about
+        onPress: on_click
         background: TouchableNativeFeedback.Ripple @props.co.BG_SEC
         },
         (cE View, {
@@ -59,15 +70,26 @@ PageMain = cC {
             justifyContent: 'center'
             alignItems: 'center'
           } },
+          # left text
+          (cE Text, {
+            style: {
+              paddingLeft: ss.TOP_PADDING
+              fontSize: ss.TITLE_SIZE
+              color: @props.co.TEXT
+            } },
+            text
+          )
+          # sec text
           (cE Text, {
             style: {
               flex: 1
               paddingLeft: ss.TOP_PADDING
               fontSize: ss.TITLE_SIZE
-              color: @props.co.TEXT
+              color: @props.co.NOLOG
             } },
-            "关于"
+            sec
           )
+          # right >
           (cE Text, {
             style: {
               width: ss.TOP_HEIGHT
@@ -111,10 +133,27 @@ PageMain = cC {
             style: {
               flex: 1
             } })
+          @_render_db_button()
           @_render_about_button()
         )
       )
     )
 }
 
-module.exports = PageMain
+# connect for redux
+{ connect } = require 'react-redux'
+
+action = require '../redux/action'
+op = require '../redux/op'
+
+mapStateToProps = ($$state, props) ->
+  {
+    db_ok: $$state.getIn ['db', 'ok']
+  }
+
+mapDispatchToProps = (dispatch, props) ->
+  o = Object.assign {}, props
+
+  o
+
+module.exports = connect(mapStateToProps, mapDispatchToProps)(PageMain)

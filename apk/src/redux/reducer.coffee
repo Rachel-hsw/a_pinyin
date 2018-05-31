@@ -38,6 +38,10 @@ reducer = ($$state, action) ->
       $$o = $$o.setIn ['user', 'symbol'], Immutable.fromJS(action.payload)
     when ac.USER_SET_SYMBOL2
       $$o = $$o.setIn ['user', 'symbol2'], Immutable.fromJS(action.payload)
+
+    when ac.DB_SET_INFO
+      $$o = $$o.update 'db', ($$d) ->
+        $$d.mergeDeep Immutable.fromJS(action.payload)
   $$o
 
 module.exports = reducer
