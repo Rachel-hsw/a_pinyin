@@ -5,21 +5,47 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
+  StyleSheet
+
   View
   Text
 } = require 'react-native'
 
-ss = require '../style'
+style = require '../style'
 {
   Touch
 } = require './_kb_sub'
 config = require '../config'
+
+{
+  ss
+} = style
+# local styles
+s = StyleSheet.create {
+  text: {
+    fontSize: style.TITLE_SIZE
+  }
+  view: {
+    height: '100%'
+  }
+  right_view: {
+    height: '100%'
+    width: style.KB_TOP_WIDTH
+  }
+
+  kb_view: {
+    flex: 1
+    flexDirection: 'row'
+  }
+  # TODO
+}
 
 
 KbTopPinyin = cC {
   displayName: 'KbTopPinyin'
   propTypes: {
     co: PropTypes.object.isRequired
+    vibration_ms: PropTypes.number.isRequired
 
     list: PropTypes.array.isRequired
 
@@ -31,21 +57,23 @@ KbTopPinyin = cC {
     on_click = =>
       @props.on_text text
     # calc cell width
-    top_width = ss.KB_TOP_WIDTH
-    font_size = ss.TITLE_SIZE  # FIXME font_size may not be correct ?
+    top_width = style.KB_TOP_WIDTH
+    font_size = style.TITLE_SIZE
     width = (top_width - font_size) + font_size * text.length
 
     (cE View, {
       key: i
-      style: {
-        height: '100%'
-        width
-      } },
+      style: [
+        s.view
+        {
+          width
+        }
+      ] },
       (cE Touch, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         text
-        font_size
-        color: @props.co.TEXT
+        text_style: s.text
         on_click
         })
     )
@@ -57,46 +85,38 @@ KbTopPinyin = cC {
     o
 
   _render_more: ->
+    text_style = [
+      s.text
+      @props.co.kb_sec_text
+    ]
     # not show more button if list is empty
     if @props.list.length < 1
       (cE View, {
-        style: {
-          height: '100%'
-          width: ss.KB_TOP_WIDTH
-        } })
+        style: s.right_view
+        })
     else
       (cE View, {
-        style: {
-          height: '100%'
-          width: ss.KB_TOP_WIDTH
-        } },
+        style: s.right_view
+        },
         (cE Touch, {
           co: @props.co
+          vibration_ms: @props.vibration_ms
           text: '>'
-          font_size: ss.TITLE_SIZE
-          color: @props.co.TEXT_SEC
-          bg: @props.co.BG
+          text_style
           on_click: @props.on_more
           })
       )
 
   render: ->
     (cE View, {
-      style: {
-        flexShrink: 0
-        height: ss.KB_TOP_HEIGHT
-        # top border
-        borderTopWidth: ss.BORDER_WIDTH
-        borderTopColor: @props.co.BORDER
-
-        flexDirection: 'row'
-      } },
+      style: [
+        ss.kb_top_view
+        @props.co.border
+      ] },
       # input list to select
       (cE View, {
-        style: {
-          flex: 1
-          flexDirection: 'row'
-        } },
+        style: s.kb_view
+        },
         @_render_list()
       )
       # more button

@@ -100,6 +100,56 @@ core_get_symbol2 = ->
     o = [ [], [], [] ]
   o
 
+
+# core config
+
+core_config_get_level = ->
+  await _n.core_config_get_level()
+
+core_config_set_level = (level) ->
+  await _n.core_config_set_level level
+
+# core levels
+CORE_LEVEL_A = 0  # 3,000 Chinese chars
+CORE_LEVEL_B = 1  # 5,000
+CORE_LEVEL_C = 2  # 7,000
+CORE_LEVEL_D = 3  # > zero freq
+CORE_LEVEL_E = 4  # all (~ 41,217)
+CORE_LEVEL_MAX = CORE_LEVEL_E
+CORE_LEVEL_DEFAULT = CORE_LEVEL_C
+
+
+core_clean_user_db = ->
+  r = await _n.core_clean_user_db()
+  if r != true
+    throw new Error "no core"  # FIXME TODO
+
+_gen_db_info = (raw) ->
+  if ! raw?
+    return null
+
+  o = {}
+  for i in raw
+    o[i.name] = i.value
+  o
+
+CORE_DATA_DB_NAME = 'core_data.db'
+USER_DATA_DB_NAME = 'user_data.db'
+
+core_get_db_info = ->
+  r = await _n.core_get_db_info()
+  raw = JSON.parse r
+  # rebuild data
+  o = {}
+  o[CORE_DATA_DB_NAME] = _gen_db_info raw[CORE_DATA_DB_NAME]
+  o[USER_DATA_DB_NAME] = _gen_db_info raw[USER_DATA_DB_NAME]
+  o
+
+exit_app = ->
+  await _n.exit_app()
+  # never got here !
+  throw new Error "exit failed"
+
 module.exports = {
   A_PINYIN_NATIVE_EVENT
 
@@ -107,6 +157,17 @@ module.exports = {
   INPUT_MODE_SYMBOL
   INPUT_MODE_SYMBOL2
   INPUT_MODE_PINYIN
+
+  CORE_LEVEL_A
+  CORE_LEVEL_B
+  CORE_LEVEL_C
+  CORE_LEVEL_D
+  CORE_LEVEL_E
+  CORE_LEVEL_MAX
+  CORE_LEVEL_DEFAULT
+
+  CORE_DATA_DB_NAME
+  USER_DATA_DB_NAME
 
   close_window  # async
   add_text  # async
@@ -122,4 +183,11 @@ module.exports = {
 
   core_get_symbol  # async
   core_get_symbol2  # async
+
+  core_config_get_level  # async
+  core_config_set_level  # async
+
+  core_clean_user_db  # async
+  core_get_db_info  # async
+  exit_app  # async
 }

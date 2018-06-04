@@ -8,7 +8,7 @@ PropTypes = require 'prop-types'
   View
 } = require 'react-native'
 
-ss = require '../style'
+{ ss } = require '../style'
 {
   Touch
   KbFlex
@@ -20,6 +20,7 @@ KbSymbol = cC {
   displayName: 'KbSymbol'
   propTypes: {
     co: PropTypes.object.isRequired
+    vibration_ms: PropTypes.number.isRequired
     list: PropTypes.array.isRequired
 
     on_text: PropTypes.func.isRequired
@@ -38,6 +39,7 @@ KbSymbol = cC {
       },
       (cE Touch, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         text
         on_click
         })
@@ -53,10 +55,8 @@ KbSymbol = cC {
 
     (cE View, {
       key: i
-      style: {
-        flexDirection: 'row'
-        height: ss.KB_SYM_LINE_HEIGHT
-      } },
+      style: ss.kb_sym_line_view
+      },
       b
     )
 
@@ -70,10 +70,8 @@ KbSymbol = cC {
 
     # 32 in 4 lines, no need to scroll
     (cE View, {
-      style: {
-        flex: 1
-        marginTop: ss.KB_PAD_V
-      } },
+      style: ss.kb_view
+      },
       lines
     )
 }

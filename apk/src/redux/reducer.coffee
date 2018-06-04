@@ -42,6 +42,10 @@ reducer = ($$state, action) ->
     when ac.DB_SET_INFO
       $$o = $$o.update 'db', ($$d) ->
         $$d.mergeDeep Immutable.fromJS(action.payload)
+
+    when ac.UPDATE_CONFIG
+      $$o = $$o.update 'config', ($$c) ->
+        $$c.merge Immutable.fromJS(action.payload)
   $$o
 
 module.exports = reducer

@@ -10,10 +10,11 @@ PropTypes = require 'prop-types'
 
   DeviceEventEmitter
   PermissionsAndroid
+  BackHandler
 } = require 'react-native'
 Subscribable = require 'Subscribable'
 
-ss = require './style'
+{ ss } = require './style'
 { get_co } = require './color'
 
 im_native = require './im_native'
@@ -22,6 +23,7 @@ PageMain = require './ui/page_main'
 PageAbout = require './ui/page_about'
 PageDebug = require './ui/page_debug'
 PageDb = require './ui/page_db'
+PageConfig = require './ui/page_config'
 
 
 _check_permissions = ->
@@ -29,7 +31,7 @@ _check_permissions = ->
   try
     if ! await PermissionsAndroid.check PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
       await PermissionsAndroid.request PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE, {
-        title: 'A拼音 需要 访问存储权限'
+        title: 'A拼音 需要 读写存储权限'
         message: '用于存储输入法词典等重要数据.'
       }
   catch e
@@ -53,18 +55,34 @@ Main = cC {
   componentDidMount: ->
     # listen to native event
     @addListenerOn DeviceEventEmitter, im_native.A_PINYIN_NATIVE_EVENT, @_on_native_event
+    # listen on handware back button
+    BackHandler.addEventListener 'hardwareBackPress', @_on_hardware_back
 
     await _check_permissions()
-    await @props.on_init()
+    if await @props.on_init()
+      @_on_show_page_db true
+
+  componentWillUnmount: ->
+    BackHandler.removeEventListener 'hardwareBackPress', @_on_hardware_back
 
   getInitialState: ->
     {
-      page: 'main'  # 'main', 'about', 'debug', 'db'
+      page: 'main'  # 'main', 'about', 'debug', 'db', 'config'
+      no_check_db: false
     }
+
+  _on_hardware_back: ->
+    switch @state.page
+      when 'main'
+        return false  # exit app
+      else  # default: go back to main page
+        @_on_show_page_main()
+    true
 
   _on_show_page_main: ->
     @setState {
       page: 'main'
+      no_check_db: false  # reset no_check_db here
     }
 
   _on_show_page_about: ->
@@ -77,9 +95,19 @@ Main = cC {
       page: 'debug'
     }
 
-  _on_show_page_db: ->
+  _on_show_page_db: (no_check) ->
+    no_check_db = false
+    if no_check is true
+      no_check_db = true
+
     @setState {
       page: 'db'
+      no_check_db
+    }
+
+  _on_show_page_config: ->
+    @setState {
+      page: 'config'
     }
 
   _render_page: ->
@@ -99,6 +127,13 @@ Main = cC {
       when 'db'
         (cE PageDb, {
           co: @props.co
+          no_check_db: @state.no_check_db
+
+          on_back: @_on_show_page_main
+          })
+      when 'config'
+        (cE PageConfig, {
+          co: @props.co
 
           on_back: @_on_show_page_main
           })
@@ -109,15 +144,15 @@ Main = cC {
           on_show_debug: @_on_show_page_debug
           on_show_about: @_on_show_page_about
           on_show_db: @_on_show_page_db
+          on_show_config: @_on_show_page_config
           })
 
   render: ->
     (cE View, {
-      style: {
-        flex: 1
-        flexDirection: 'column'
-        backgroundColor: @props.co.BG
-      } },
+      style: [
+        ss.ui_main_view
+        @props.co.ui_main_view
+      ] },
       @_render_page()
     )
 }

@@ -103,8 +103,8 @@ android {
     applicationId "org.sceext.a_pinyin"
     minSdkVersion 21
     targetSdkVersion 23
-    versionName "1.1.0 test20180601 0028"
-    versionCode 101
+    versionName "1.2.0 test20180604 1147"
+    versionCode 102
     ndk {
       abiFilters "armeabi-v7a", "arm64-v8a", "x86"
     }

@@ -21,6 +21,8 @@ USER_SET_SYMBOL2 = 'user_set_symbol2'
 
 DB_SET_INFO = 'db_set_info'
 
+UPDATE_CONFIG = 'update_config'
+
 set_co = (co) ->
   {
     type: A_SET_CO
@@ -89,6 +91,12 @@ db_set_info = (payload) ->
     payload
   }
 
+update_config = (payload) ->
+  {
+    type: UPDATE_CONFIG
+    payload
+  }
+
 module.exports = {
   A_SET_CO
   A_RESET_UI
@@ -106,6 +114,8 @@ module.exports = {
 
   DB_SET_INFO
 
+  UPDATE_CONFIG
+
   set_co
   reset_ui
   set_layout
@@ -121,4 +131,6 @@ module.exports = {
   user_set_symbol2
 
   db_set_info
+
+  update_config
 }

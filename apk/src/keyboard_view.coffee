@@ -12,7 +12,7 @@ PropTypes = require 'prop-types'
 } = require 'react-native'
 Subscribable = require 'Subscribable'
 
-ss = require './style'
+{ ss } = require './style'
 { get_co } = require './color'
 
 im_native = require './im_native'
@@ -36,7 +36,7 @@ KeyboardView = cC {
     co: PropTypes.object.isRequired
 
     layout: PropTypes.string.isRequired
-    co_name: PropTypes.string.isRequired
+    vibration_ms: PropTypes.number.isRequired
 
     core_nolog: PropTypes.bool.isRequired
     list_symbol: PropTypes.array.isRequired
@@ -45,7 +45,6 @@ KeyboardView = cC {
     on_native_event: PropTypes.func.isRequired
     on_init: PropTypes.func.isRequired
 
-    on_set_co: PropTypes.func.isRequired
     on_close: PropTypes.func.isRequired
     on_set_layout: PropTypes.func.isRequired
     on_set_nolog: PropTypes.func.isRequired
@@ -84,6 +83,7 @@ KeyboardView = cC {
   _render_pinyin: ->
     (cE KbPinyin, {
       co: @props.co
+      vibration_ms: @props.vibration_ms
       layout: @props.layout
       core_nolog: @props.core_nolog
 
@@ -101,6 +101,7 @@ KeyboardView = cC {
       [
         (cE KbTop, {
           co: @props.co
+          vibration_ms: @props.vibration_ms
           kb: @state.kb
           is_nolog: @props.core_nolog
           on_set_kb: @_on_set_kb
@@ -116,11 +117,10 @@ KeyboardView = cC {
       when 'more'
         (cE KbMore, {
           co: @props.co
+          vibration_ms: @props.vibration_ms
           layout: @props.layout
-          co_name: @props.co_name
           is_nolog: @props.core_nolog
           on_set_layout: @props.on_set_layout
-          on_set_co: @props.on_set_co
           on_set_nolog: @props.on_set_nolog
 
           key: 2
@@ -128,6 +128,7 @@ KeyboardView = cC {
       when 'english'
         (cE KbEnglish, {
           co: @props.co
+          vibration_ms: @props.vibration_ms
           layout: @props.layout
           on_text: @props.on_text
           on_key_delete: @props.on_key_delete
@@ -138,6 +139,7 @@ KeyboardView = cC {
       when 'number'
         (cE KbNumber, {
           co: @props.co
+          vibration_ms: @props.vibration_ms
           on_text: @props.on_text
           on_key_delete: @props.on_key_delete
           on_key_enter: @props.on_key_enter
@@ -147,6 +149,7 @@ KeyboardView = cC {
       when 'symbol'
         (cE KbSymbol, {
           co: @props.co
+          vibration_ms: @props.vibration_ms
           list: @props.list_symbol
           on_text: @props.on_text_symbol
           reload: @props.reload_symbol
@@ -156,6 +159,7 @@ KeyboardView = cC {
       when 'symbol2'
         (cE KbSymbol2, {
           co: @props.co
+          vibration_ms: @props.vibration_ms
           list: @props.list_symbol2
           on_text: @props.on_text_symbol2
           reload: @props.reload_symbol2
@@ -165,10 +169,10 @@ KeyboardView = cC {
 
   render: ->
     (cE View, {
-      style: {
-        backgroundColor: @props.co.BG
-        height: ss.KB_HEIGHT
-      } },
+      style: [
+        ss.keyboard_view
+        @props.co.keyboard_view
+      ] },
       @_render_kb()
     )
 }
@@ -180,12 +184,10 @@ action = require './redux/action'
 op = require './redux/op'
 
 mapStateToProps = ($$state, props) ->
-  co_name = $$state.get 'co'
-
   {
-    co_name
-    co: get_co co_name
+    co: get_co $$state.get('co')
     layout: $$state.get 'layout'
+    vibration_ms: $$state.getIn ['config', 'vibration_ms']
 
     core_nolog: $$state.getIn ['core', 'nolog']
     list_symbol: $$state.getIn(['user', 'symbol']).toJS()
@@ -203,8 +205,6 @@ mapDispatchToProps = (dispatch, props) ->
     await dispatch op.load_user_symbol()
     await dispatch op.load_user_symbol2()
 
-  o.on_set_co = (co) ->
-    dispatch action.set_co(co)
   o.on_set_layout = (name) ->
     dispatch action.set_layout(name)
   o.on_set_nolog = (nolog) ->

@@ -2,6 +2,9 @@
 
 path = require 'path'
 
+{
+  Alert
+} = require 'react-native'
 { default: RNFetchBlob } = require 'react-native-fetch-blob'
 
 action = require './action'
@@ -265,36 +268,69 @@ _merge_list = (raw) ->
 check_db = ->
   (dispatch, getState) ->
     ok = true
-    # check core_data.db
+    # check core_data.db, path and size
     if await RNFetchBlob.fs.exists(config.DB_CORE_DATA)
-      DB_NAME = 'core_data.db'
       stat = await RNFetchBlob.fs.stat(config.DB_CORE_DATA)
-      o = {
-        db_path: {}
-        db_size: {}
+      o = {}
+      o[im_native.CORE_DATA_DB_NAME] = {
+        path: config.DB_CORE_DATA
+        size: stat.size
       }
-      o.db_path[DB_NAME] = config.DB_CORE_DATA
-      o.db_size[DB_NAME] = stat.size
       dispatch action.db_set_info(o)
     else
       ok = false
-    # check user_data.db
+    # check user_data.db, path and size
     if await RNFetchBlob.fs.exists(config.DB_USER_DATA)
-      DB_NAME = 'user_data.db'
       stat = await RNFetchBlob.fs.stat(config.DB_USER_DATA)
-      o = {
-        db_path: {}
-        db_size: {}
+      o = {}
+      o[im_native.USER_DATA_DB_NAME] = {
+        path: config.DB_USER_DATA
+        size: stat.size
       }
-      o.db_path[DB_NAME] = config.DB_USER_DATA
-      o.db_size[DB_NAME] = stat.size
       dispatch action.db_set_info(o)
     else
       ok = false
-    # TODO invoke im_native to check db content (version ?)
+    # use im_native
+    r = await im_native.core_get_db_info()
+    o = {}
+    i = r[im_native.CORE_DATA_DB_NAME]
+    if i?
+      o[im_native.CORE_DATA_DB_NAME] = {
+        db_version: i.db_version
+        db_type: i.db_type
+        data_version: i.data_version
+        last_update: i.last_update
+      }
+    i = r[im_native.USER_DATA_DB_NAME]
+    if i?
+      o[im_native.USER_DATA_DB_NAME] = {
+        db_version: i.db_version
+        db_type: i.db_type
+        data_version: i.data_version
+        last_update: i.last_update
+      }
+    dispatch action.db_set_info(o)
+    # TODO check db version ?
     dispatch action.db_set_info({
       ok
     })
+    # show alert if db is error
+    if ! ok
+      await dispatch _show_alert()
+
+_show_alert = ->
+  (dispatch, getState) ->
+    new Promise (resolve) ->
+      on_cancel = ->
+        # nothing to do
+        resolve false
+      on_ok = ->
+        dispatch dl_db()
+        resolve true
+      Alert.alert '数据库错误或不存在 !', '需要下载数据库, A拼音 才能正常工作.', [
+        { text: '取消', onPress: on_cancel, style: 'cancel' }
+        { text: '下载', onPress: on_ok }
+      ], { cancelable: false }
 
 dl_db = ->
   (dispatch, getState) ->
@@ -356,6 +392,44 @@ _dl_one_db = (local_file, url, description) ->
   catch e
     # TODO ignore error
 
+# core config
+
+load_core_config = ->
+  (dispatch, getState) ->
+    # core level
+    core_level = await im_native.core_config_get_level()
+    dispatch action.update_config({
+      core_level
+    })
+
+set_core_level = (level) ->
+  (dispatch, getState) ->
+    await im_native.core_config_set_level level
+    await dispatch load_core_config()
+
+clean_user_db = ->
+  (dispatch, getState) ->
+    dispatch action.db_set_info({
+      cleaning: true
+    })
+    try
+      await im_native.core_clean_user_db()
+      # clean OK
+      util.toast "整理完成."
+    catch e
+      # TODO more error info ?
+      util.toast "数据库整理失败 !"
+    # end doing
+    dispatch action.db_set_info({
+      cleaning: false
+    })
+    # reload db info
+    await dispatch check_db()
+
+exit_app = ->
+  (dispatch, getState) ->
+    await im_native.exit_app()
+
 module.exports = {
   close_window  # thunk
   add_text  # thunk
@@ -380,4 +454,10 @@ module.exports = {
 
   check_db  # thunk
   dl_db  # thunk
+
+  load_core_config  # thunk
+  set_core_level  # thunk
+
+  clean_user_db  # thunk
+  exit_app  # thunk
 }

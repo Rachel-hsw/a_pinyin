@@ -5,11 +5,13 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
+  StyleSheet
+
   View
   Text
 } = require 'react-native'
 
-ss = require '../style'
+{ ss } = require '../style'
 
 {
   KbLayouts1097
@@ -38,10 +40,12 @@ KB_LAYOUTS_ABCD7109 = [  # layouts 7109
   'rRsStTuUvVwWxXyYzZ'
 ]
 
+
 KbEnglish = cC {
   displayName: 'KbEnglish'
   propTypes: {
     co: PropTypes.object.isRequired
+    vibration_ms: PropTypes.number.isRequired
 
     layout: PropTypes.string.isRequired
     no_shift: PropTypes.bool
@@ -84,13 +88,12 @@ KbEnglish = cC {
       shift = null
 
     (cE View, {
-      style: {
-        marginTop: ss.KB_PAD_V
-        flex: 1
-      } },
+      style: ss.kb_view
+      },
       # main keyboard buttons
       (cE Layout, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         shift
         layouts
 
@@ -101,6 +104,7 @@ KbEnglish = cC {
       # button line
       (cE KbLineBottom, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         shift
         on_text: @props.on_text
         on_key_enter: @props.on_key_enter

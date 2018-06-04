@@ -9,7 +9,7 @@ PropTypes = require 'prop-types'
   Text
 } = require 'react-native'
 
-ss = require '../style'
+style = require '../style'
 
 KbTop = require './kb_top'
 KbTopPinyin = require './kb_top_pinyin'
@@ -38,6 +38,7 @@ KbPinyin = cC {
   displayName: 'KbPinyin'
   propTypes: {
     co: PropTypes.object.isRequired
+    vibration_ms: PropTypes.number.isRequired
     layout: PropTypes.string.isRequired
     core_nolog: PropTypes.bool.isRequired
 
@@ -76,6 +77,7 @@ KbPinyin = cC {
     if show_top_list
       (cE KbTopPinyin, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         list
         on_text: @props.on_pinyin_select_item
         on_more: @_on_top_more
@@ -85,6 +87,7 @@ KbPinyin = cC {
     else
       (cE KbTop, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         kb: 'pinyin'
         is_nolog: @props.core_nolog
         on_set_kb: @props.on_set_kb
@@ -97,6 +100,7 @@ KbPinyin = cC {
     if @props.top_more
       (cE KbPinyinMore, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         list: @props.list
         on_text: @props.on_pinyin_select_item
         on_reset: @props.on_reset
@@ -107,6 +111,7 @@ KbPinyin = cC {
     else
       (cE KbEnglish, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         layout: @props.layout
         no_shift: true
         on_shift: @props.on_reset  # shift key is 'reset' key here

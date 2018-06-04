@@ -8,17 +8,16 @@ PropTypes = require 'prop-types'
   View
   Text
 
-  ScrollView
-  TouchableNativeFeedback
-
   Dimensions
   Image
 } = require 'react-native'
 
-ss = require '../style'
-
 {
   PageTop
+  RightItem
+  ScrollPage
+
+  s
 } = require './sub'
 img = require '../img'
 
@@ -33,6 +32,7 @@ PageMain = cC {
     on_show_debug: PropTypes.func.isRequired
     on_show_about: PropTypes.func.isRequired
     on_show_db: PropTypes.func.isRequired
+    on_show_config: PropTypes.func.isRequired
   }
 
   _render_main_logo: ->
@@ -44,99 +44,43 @@ PageMain = cC {
         height: Dimensions.get('window').width
       } })
 
-  _render_about_button: ->
-    @_render_one_button '关于', @props.on_show_about, ''
-
   _render_db_button: ->
     sec = ''
     if @props.db_ok is false
       sec = '错误 !'
-    @_render_one_button '数据库', @props.on_show_db, sec
+    @_render_one_button '数据', @props.on_show_db, sec
 
-  _render_one_button: (text, on_click, sec) ->
-    (cE View, {
-      style: {
-        height: ss.TOP_HEIGHT
-      } },
-      (cE TouchableNativeFeedback, {
-        onPress: on_click
-        background: TouchableNativeFeedback.Ripple @props.co.BG_SEC
-        },
-        (cE View, {
-          style: {
-            height: ss.TOP_HEIGHT
-            width: '100%'
-            flexDirection: 'row'
-            justifyContent: 'center'
-            alignItems: 'center'
-          } },
-          # left text
-          (cE Text, {
-            style: {
-              paddingLeft: ss.TOP_PADDING
-              fontSize: ss.TITLE_SIZE
-              color: @props.co.TEXT
-            } },
-            text
-          )
-          # sec text
-          (cE Text, {
-            style: {
-              flex: 1
-              paddingLeft: ss.TOP_PADDING
-              fontSize: ss.TITLE_SIZE
-              color: @props.co.NOLOG
-            } },
-            sec
-          )
-          # right >
-          (cE Text, {
-            style: {
-              width: ss.TOP_HEIGHT
-              fontSize: ss.TITLE_SIZE
-              color: @props.co.TEXT_SEC
-              textAlign: 'center'
-            } },
-            ">"
-          )
-        )
-      )
-    )
+  _render_one_button: (text, on_click, text_sec) ->
+    (cE RightItem, {
+      co: @props.co
+      text
+      text_sec
+      on_click
+      })
+
+  _get_top_text: ->
+    if __DEV__
+      'A拼音 (DEV)'
+    else
+      'A拼音'
 
   render: ->
-    (cE View, {
-      style: {
-        flex: 1
-        flexDirection: 'column'
-      } },
-      (cE PageTop, {
+    (cE ScrollPage, {
+      co: @props.co
+      top: (cE PageTop, {
         co: @props.co
-        text: 'A拼音'
+        text: @_get_top_text()
         on_click: @props.on_show_debug
         })
-      (cE ScrollView, {
-        style: {
-          flex: 1
-          flexDirection: 'column'
-        }
-        contentContainerStyle: {
-          flexGrow: 1
-        } },
-        (cE View, {
-          style: {
-            flex: 1
-            flexDirection: 'column'
-          } },
-          @_render_main_logo()
-          # gap
-          (cE View, {
-            style: {
-              flex: 1
-            } })
-          @_render_db_button()
-          @_render_about_button()
-        )
-      )
+      },
+      @_render_main_logo()
+      # gap
+      (cE View, { style: s.fill_view })
+      # config page
+      @_render_one_button '设置', @props.on_show_config, ''
+      @_render_db_button()
+      # about button
+      @_render_one_button '关于', @props.on_show_about, ''
     )
 }
 

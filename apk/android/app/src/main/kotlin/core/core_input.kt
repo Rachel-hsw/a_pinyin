@@ -4,6 +4,8 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 import com.beust.klaxon.json
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.JsonArray
 
 import org.sceext.a_pinyin.core_symbol.BCoreSymbol
 import org.sceext.a_pinyin.core_symbol.BCoreSymbol2
@@ -15,10 +17,94 @@ const val INPUT_MODE_SYMBOL: Int = 1
 const val INPUT_MODE_SYMBOL2: Int = 2
 const val INPUT_MODE_PINYIN: Int = 3
 
-// TODO sqlite3 database file
+// sqlite3 database file
 const val CORE_DATA_DB: String = "/sdcard/a_pinyin/core/core_data.db"
 const val USER_DATA_DB: String = "/sdcard/a_pinyin/user/user_data.db"
-// FIXME TODO when to VACUUM user_data.db ?
+
+const val CORE_DATA_DB_NAME: String = "core_data.db"
+const val USER_DATA_DB_NAME: String = "user_data.db"
+
+// sqlite3: ANALYZE and VACUUM
+fun clean_user_db() {
+    val conn = _open_db_user(USER_DATA_DB)
+    // turn-off transaction
+    conn.autoCommit = true
+
+    println("DEBUG: core_input.clean_user_db()  ANALYZE")
+    // ANALYZE
+    conn.prepareStatement("ANALYZE").execute()
+
+    println("DEBUG: core_input.clean_user_db()  VACUUM")
+    // VACUUM
+    conn.prepareStatement("VACUUM").execute()
+
+    // close connection
+    conn.close()
+    println("DEBUG: core_input.clean_user_db()  [ OK ]")
+}
+
+fun get_db_info(): JsonObject {
+    var core_db_info: JsonArray<Any?>? = null
+    var user_db_info: JsonArray<Any?>? = null
+    var conn: Connection? = null
+    var conn_user: Connection? = null
+    try {
+        conn = _open_db(CORE_DATA_DB)
+        core_db_info = _get_one_db_info(conn)
+    } catch (e: Exception) {
+        e.printStackTrace()  // ignore error
+    }
+    try {
+        conn_user = _open_db_user(USER_DATA_DB)
+        user_db_info = _get_one_db_info(conn_user)
+    } catch (e: Exception) {
+        e.printStackTrace()  // ignore error
+    }
+    // close connection
+    conn?.close()
+    conn_user?.close()
+
+    return json {
+        obj(CORE_DATA_DB_NAME to core_db_info,
+            USER_DATA_DB_NAME to user_db_info)
+    }
+}
+
+private fun _get_one_db_info(conn: Connection): JsonArray<Any?> {
+    val p = conn.prepareStatement("SELECT name, value, `desc` FROM a_pinyin")
+    val r = p.executeQuery()
+
+    val o: MutableList<JsonObject> = mutableListOf()
+    while (r.next()) {
+        val one = json {
+            obj("name" to r.getString(1),
+                "value" to r.getString(2),
+                "desc" to r.getString(3))
+        }
+        o.add(one)
+    }
+    return json {
+        array(o)
+    }
+}
+
+private fun _open_db(db_file: String): Connection {
+    println("DEBUG: core_input: open sqlite3 database  ${db_file}")
+    // load jdbc driver first
+    Class.forName("org.sqlite.JDBC")
+
+    val conn = DriverManager.getConnection("jdbc:sqlite:${db_file}")
+
+    return conn
+}
+
+private fun _open_db_user(db_file: String): Connection {
+    println("DEBUG: core_input: open user database  ${db_file}")
+
+    val conn = DriverManager.getConnection("jdbc:sqlite:${db_file}")
+    return conn
+}
+
 
 class CoreInput {
 
@@ -86,23 +172,6 @@ class CoreInput {
 
         println("DEBUG: CoreInput.init()  done")
         _is_init_done = true
-    }
-
-    private fun _open_db(db_file: String): Connection {
-        println("DEBUG: open sqlite3 database  ${db_file}")
-        // load jdbc driver first
-        Class.forName("org.sqlite.JDBC")
-
-        val conn = DriverManager.getConnection("jdbc:sqlite:${db_file}")
-
-        return conn
-    }
-
-    private fun _open_db_user(db_file: String): Connection {
-        println("DEBUG: open user database  ${db_file}")
-
-        val conn = DriverManager.getConnection("jdbc:sqlite:${db_file}")
-        return conn
     }
 
     // FIXME start_input / end_input is still very BUG

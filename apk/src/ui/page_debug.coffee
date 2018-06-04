@@ -8,16 +8,15 @@ PropTypes = require 'prop-types'
   View
   Text
 
-  ScrollView
-
   TextInput
   Button
 } = require 'react-native'
 
-ss = require '../style'
-
 {
   PageTop
+  ScrollPage
+
+  s
 } = require './sub'
 
 
@@ -32,6 +31,7 @@ PageDebug = cC {
     core_input_mode: PropTypes.number
     core_nolog: PropTypes.bool.isRequired
 
+    on_exit_app: PropTypes.func.isRequired
     on_back: PropTypes.func.isRequired
   }
 
@@ -48,74 +48,54 @@ PageDebug = cC {
   _render_text_input: ->
     if @state.show_text_input
       (cE TextInput, {
-        style: {
-          color: @props.co.TEXT
-        } })
+        style: [
+          @props.co.text
+        ] })
 
-  _render_debug: ->
-    (cE View, {
-      style: {
-        flexDirection: 'column'
-        margin: ss.TOP_PADDING
-      } },
+  _render_text: (text) ->
+    (cE Text, {
+      style: [
+        s.debug_text
+        @props.co.ui_text_sec
+      ] },
+      text
+    )
+
+  render: ->
+    (cE ScrollPage, {
+      co: @props.co
+      top: (cE PageTop, {
+        co: @props.co
+        text: 'DEBUG'
+        on_back: @props.on_back
+        })
+      margin: true
+      },
+      # debug page body
       @_render_text_input()
 
       # headless_count
-      (cE Text, {
-        style: {
-          fontSize: ss.TEXT_SIZE
-          color: @props.co.TEXT_SEC
-        } },
-        "+ headless count: #{@props.headless_count}"
-      )
+      @_render_text "+ headless count: #{@props.headless_count}"
       # core status
-      (cE Text, {
-        style: {
-          fontSize: ss.TEXT_SIZE
-          color: @props.co.TEXT_SEC
-        } },
-        "+ core status: is_input #{@props.core_is_input}"
-      )
-      (cE Text, {
-        style: {
-          fontSize: ss.TEXT_SIZE
-          color: @props.co.TEXT_SEC
-        } },
-        "+ core status: input_mode #{@props.core_input_mode}"
-      )
-      (cE Text, {
-        style: {
-          fontSize: ss.TEXT_SIZE
-          color: @props.co.TEXT_SEC
-        } },
-        "+ core status: nolog #{@props.core_nolog}"
-      )
+      @_render_text "+ core status: is_input #{@props.core_is_input}"
+      @_render_text "+ core status: input_mode #{@props.core_input_mode}"
+      @_render_text "+ core status: nolog #{@props.core_nolog}"
 
       # toggle text button
       (cE Button, {
         title: 'toggle Text input'
         onPress: @_on_toggle_text_input
         })
-    )
 
-  render: ->
-    (cE View, {
-      style: {
-        flex: 1
-        flexDirection: 'column'
-      } },
-      (cE PageTop, {
-        co: @props.co
-        text: 'DEBUG'
-        on_back: @props.on_back
+      # placeholder
+      (cE View, {
+        style: s.fill_view
         })
-      (cE ScrollView, {
-        style: {
-          flex: 1
-          flexDirection: 'column'
-        } },
-        @_render_debug()
-      )
+      # force-exit function
+      (cE Button, {
+        title: 'exit'
+        onPress: @props.on_exit_app
+        })
     )
 }
 
@@ -135,6 +115,8 @@ mapStateToProps = ($$state, props) ->
 
 mapDispatchToProps = (dispatch, props) ->
   o = Object.assign {}, props
+  o.on_exit_app = ->
+    dispatch op.exit_app()
 
   o
 

@@ -38,15 +38,33 @@ init_state = {
   # database status
   db: {
     ok: null  # is database OK
-    db_path: {
-      'core_data.db': null
-      'user_data.db': null
-    }
-    db_size: {
-      'core_data.db': -1
-      'user_data.db': -1
-    }
     dling: false  # doing db download
+    cleaning: false  # clean user db
+    # core db info
+    'core_data.db': {
+      path: null
+      size: -1
+      # from im_native.core_get_db_info
+      db_version: null
+      db_type: null
+      data_version: null
+      last_update: null
+    }
+    'user_data.db': {
+      path: null
+      size: -1
+      # from im_native.core_get_db_info
+      db_version: null
+      db_type: null
+      data_version: null
+      last_update: null
+    }
+  }
+
+  # config values
+  config: {
+    vibration_ms: 20  # default: 20 ms
+    core_level: null
   }
 }
 

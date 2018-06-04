@@ -1,6 +1,8 @@
 # config.coffee, a_pinyin/apk/src/
 
-P_VERSION = 'a_pinyin version 1.1.0 test20180601 0028'
+P_VERSION = 'a_pinyin version 1.2.0 test20180604 1147'
+
+CORE_DB_VERSION = '1.0.0'
 
 # for delete key, multi-delete function
 DELETE_KEY_DELAY_FIRST = 300  # 300ms before first delete
@@ -27,6 +29,7 @@ DB_TMP_SUFFIX = '.tmp'
 
 module.exports = {
   P_VERSION
+  CORE_DB_VERSION
 
   DELETE_KEY_DELAY_FIRST
   DELETE_KEY_DELAY_MS

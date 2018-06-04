@@ -28,6 +28,9 @@ import org.sceext.a_pinyin.core.INPUT_MODE_SYMBOL
 import org.sceext.a_pinyin.core.INPUT_MODE_SYMBOL2
 import org.sceext.a_pinyin.core.INPUT_MODE_PINYIN
 
+import org.sceext.a_pinyin.core.clean_user_db
+import org.sceext.a_pinyin.core.get_db_info
+
 
 const val MODULE_NAME: String = "im_native"
 
@@ -222,6 +225,55 @@ class ImNative : ReactContextBaseJavaModule {
         } catch (e: Exception) {
             e.printStackTrace()  // ignore error
         }
+    }
+
+    // core config
+
+    @ReactMethod
+    fun core_config_get_level(promise: Promise) {
+        val core = pinyin_service?.core()
+        if (core == null) {
+            promise.resolve(null)
+            return
+        }
+        val level = core.pinyin().get_level()
+        promise.resolve(level)
+    }
+
+    @ReactMethod
+    fun core_config_set_level(level: Int, promise: Promise) {
+        val core = pinyin_service?.core()
+        if (core == null) {
+            promise.resolve(null)
+            return
+        }
+        core.pinyin().set_level(level)
+        promise.resolve(true)
+    }
+
+    @ReactMethod
+    fun core_clean_user_db(promise: Promise) {
+        // TODO process Exception ?
+        clean_user_db()
+        // FIXME never reject
+        promise.resolve(true)
+    }
+
+    @ReactMethod
+    fun core_get_db_info(promise: Promise) {
+        val r = get_db_info()
+        // never reject
+        promise.resolve(r.toJsonString())
+    }
+
+    @ReactMethod
+    fun exit_app(promise: Promise) {
+        // DEBUG
+        println("DEBUG: ImNative.exit_app()")
+
+        System.exit(0)
+        // never got here
+        promise.resolve(true)
     }
 }
 

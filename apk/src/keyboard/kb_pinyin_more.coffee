@@ -5,17 +5,50 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
+  StyleSheet
+
   View
   Text
   ScrollView
 } = require 'react-native'
 
-ss = require '../style'
+style = require '../style'
 {
   Touch
   KbFlex
 } = require './_kb_sub'
 config = require '../config'
+
+{
+  ss
+} = style
+# local styles
+s = StyleSheet.create {
+  left_line_view: {
+    borderTopWidth: style.KB_BUTTON_BORDER_WIDTH
+    marginLeft: style.KB_PINYIN_MORE_LINE_MARGIN
+    marginRight: style.KB_PINYIN_MORE_LINE_MARGIN
+  }
+
+  kb_view: {
+    flex: 1
+    flexDirection: 'row'
+  }
+  right_view: {
+    width: style.KB_PINYIN_MORE_RIGHT_WIDTH
+    marginTop: style.KB_PAD_V
+  }
+
+  right_button: {
+    height: style.KB_SYM_LINE_HEIGHT
+  }
+  sec_view: {
+    borderWidth: style.BORDER_WIDTH / 2
+  }
+  reset_button: {
+    fontSize: style.TEXT_SIZE
+  }
+}
 
 
 _calc_lines_to_render = (raw) ->
@@ -75,6 +108,7 @@ KbPinyinMore = cC {
   displayName: 'KbPinyinMore'
   propTypes: {
     co: PropTypes.object.isRequired
+    vibration_ms: PropTypes.number.isRequired
     list: PropTypes.array.isRequired
 
     on_text: PropTypes.func.isRequired
@@ -87,7 +121,9 @@ KbPinyinMore = cC {
     if ! one[1]?
       return (cE KbFlex, {
         key
-        flex: one[0]
+        style: {
+          flex: one[0]  # TODO
+        }
       })
 
     on_click = =>
@@ -95,10 +131,12 @@ KbPinyinMore = cC {
 
     (cE KbFlex, {
       key
-      flex: one[0]
-      },
+      style: {
+        flex: one[0]
+      } },
       (cE Touch, {
         co: @props.co
+        vibration_ms: @props.vibration_ms
         text: one[1]
         on_click
         })
@@ -116,10 +154,8 @@ KbPinyinMore = cC {
 
       o.push (cE View, {
         key: key_line
-        style: {
-          flexDirection: 'row'
-          height: ss.KB_SYM_LINE_HEIGHT  # TODO more height for large text ?
-        } },
+        style: ss.kb_sym_line_view
+        },
         one
       )
       key_line += 1
@@ -140,64 +176,64 @@ KbPinyinMore = cC {
       # line border
       o.push (cE View, {
         key: key_line
-        style: {
-          borderTopWidth: ss.KB_BUTTON_BORDER_WIDTH
-          borderTopColor: @props.co.TEXT_SEC
-          marginLeft: ss.KB_PINYIN_MORE_LINE_MARGIN
-          marginRight: ss.KB_PINYIN_MORE_LINE_MARGIN
-        } })
+        style: [
+          s.left_line_view
+          @props.co.border
+        ]
+      })
       key_line += 1
 
     (cE ScrollView, {
-      style: {
-        flex: 1
-      } },
+      style: ss.kb_scrollview
+      },
       (cE View, {
-        style: {
-          flex: 1
-          marginTop: ss.KB_PAD_V
-        } },
+        style: ss.kb_view
+        },
         o
       )
     )
 
   render: ->
+    view_style = [
+      s.sec_view
+    ]
+    text_style = [
+      @props.co.kb_sec_text
+    ]
     (cE View, {
-      style: {
-        flex: 1
-        flexDirection: 'row'
-      } },
+      style: s.kb_view
+      },
       @_render_left()
       # right part
       (cE View, {
-        style: {
-          width: ss.KB_PINYIN_MORE_RIGHT_WIDTH
-          marginTop: ss.KB_PAD_V
-        } },
+        style: s.right_view
+        },
         # more_back button
         (cE View, {
-          style: {
-            height: ss.KB_SYM_LINE_HEIGHT
-          } },
+          style: s.right_button
+          },
           (cE Touch, {
             co: @props.co
-            text: '⇑'  # TODO
-            color: @props.co.TEXT_SEC
-            border: true
+            vibration_ms: @props.vibration_ms
+            text: '⇑'
+            view_style
+            text_style
             on_click: @props.on_back
             })
         )
         # reset button
         (cE View, {
-          style: {
-            height: ss.KB_SYM_LINE_HEIGHT
-          } },
+          style: s.right_button
+          },
           (cE Touch, {
             co: @props.co
+            vibration_ms: @props.vibration_ms
             text: '重输'
-            border: true
-            font_size: ss.TEXT_SIZE
-            color: @props.co.TEXT_SEC
+            view_style
+            text_style: [
+              text_style
+              s.reset_button
+            ]
             on_click: @props.on_reset
             })
         )

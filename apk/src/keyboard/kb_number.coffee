@@ -5,11 +5,13 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
+  StyleSheet
+
   View
   Text
 } = require 'react-native'
 
-ss = require '../style'
+style = require '../style'
 
 {
   Touch
@@ -20,11 +22,33 @@ ss = require '../style'
   KbEnterKey
 } = require './_kb_sub'
 
+{
+  ss
+} = style
+# local styles
+s = StyleSheet.create {
+  kb_view: {
+    flexDirection: 'row'
+  }
+
+  view_left: {
+    flex: 1
+  }
+  view_main: {
+    width: style.KB_NUMBER_WIDTH
+    flexShrink: 0
+  }
+  flex_right: {
+    flex: style.KB_NUMBER_RIGHT_BUTTON_FLEX
+  }
+}
+
 
 TextButton = cC {
   displayName: 'TextButton'
   propTypes: {
     co: PropTypes.object.isRequired
+    vibration_ms: PropTypes.number.isRequired
     text: PropTypes.string.isRequired
     char: PropTypes.string.isRequired
     is_second: PropTypes.bool
@@ -37,14 +61,15 @@ TextButton = cC {
     @props.on_text @props.char
 
   render: ->
-    color = @props.co.TEXT
+    text_style = []
     if @props.is_second
-      color = @props.co.TEXT_SEC
+      text_style.push @props.co.kb_sec_text
 
     touch = (cE Touch, {
       co: @props.co
+      vibration_ms: @props.vibration_ms
       text: @props.text
-      color
+      text_style
       on_click: @_on_click
       })
 
@@ -60,6 +85,7 @@ KbNumber = cC {
   displayName: 'KbNumber'
   propTypes: {
     co: PropTypes.object.isRequired
+    vibration_ms: PropTypes.number.isRequired
 
     on_text: PropTypes.func.isRequired
     on_key_delete: PropTypes.func.isRequired
@@ -69,6 +95,7 @@ KbNumber = cC {
   _render_button: (text, char, is_second, no_flex) ->
     (cE TextButton, {
       co: @props.co
+      vibration_ms: @props.vibration_ms
       text
       char
       is_second
@@ -79,16 +106,14 @@ KbNumber = cC {
 
   render: ->
     (cE View, {
-      style: {
-        flex: 1
-        flexDirection: 'row'
-        marginTop: ss.KB_PAD_V
-      } },
+      style: [
+        ss.kb_view
+        s.kb_view
+      ] },
       # left part
       (cE View, {
-        style: {
-          flex: 1
-        } },
+        style: s.view_left
+        },
         # add '+', '-', '*', '/' buttons here
         (cE KbLine, null,
           @_render_button '+', '+', true
@@ -105,20 +130,19 @@ KbNumber = cC {
       )
       # main part
       (cE View, {
-        style: {
-          width: ss.KB_NUMBER_WIDTH
-          flexShrink: 0
-        } },
+        style: s.view_main
+        },
         (cE KbLine, null,
           @_render_button '7', '7'
           @_render_button '8', '8'
           @_render_button '9', '9'
           # delete key
           (cE KbFlex, {
-            flex: ss.KB_NUMBER_RIGHT_BUTTON_FLEX
+            style: s.flex_right
             },
             (cE KbDeleteKey, {
               co: @props.co
+              vibration_ms: @props.vibration_ms
               on_delete: @props.on_key_delete
               })
           )
@@ -129,7 +153,7 @@ KbNumber = cC {
           @_render_button '6', '6'
           # '%' button here
           (cE KbFlex, {
-            flex: ss.KB_NUMBER_RIGHT_BUTTON_FLEX
+            style: s.flex_right
             },
             @_render_button '%', '%', true, true
           )
@@ -140,7 +164,7 @@ KbNumber = cC {
           @_render_button '3', '3'
           # ',' button here
           (cE KbFlex, {
-            flex: ss.KB_NUMBER_RIGHT_BUTTON_FLEX
+            style: s.flex_right
             },
             @_render_button ',', ',', true, true
           )
@@ -151,16 +175,18 @@ KbNumber = cC {
           (cE KbFlex, null,
             (cE KbSpaceButton, {
               co: @props.co
+              vibration_ms: @props.vibration_ms
               on_text: @props.on_text
               })
           )
           @_render_button '.', '.'
           # enter key
           (cE KbFlex, {
-            flex: ss.KB_NUMBER_RIGHT_BUTTON_FLEX
+            style: s.flex_right
             },
             (cE KbEnterKey, {
               co: @props.co
+              vibration_ms: @props.vibration_ms
               on_click: @props.on_key_enter
               })
           )

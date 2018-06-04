@@ -5,29 +5,56 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
+  StyleSheet
+
   View
   Text
 } = require 'react-native'
 
-co = require '../color'
-ss = require '../style'
+style = require '../style'
 
 {
   Touch
   KbFlex
 } = require './_kb_sub'
 
+{
+  ss
+} = style
+# local styles
+s = StyleSheet.create {
+  button_view: {
+    borderWidth: style.BORDER_WIDTH / 2
+  }
+  button_text: {
+    fontSize: style.TEXT_SIZE
+  }
+
+  nolog_text: {
+    fontSize: style.TEXT_SIZE
+  }
+
+  title_text: {
+    fontSize: style.TEXT_SIZE
+  }
+
+  option_view: {
+    flexDirection: 'row'
+    marginTop: style.KB_PAD_V
+    height: 50  # TODO
+  }
+}
+
 
 KbMore = cC {
   displayName: 'KbMore'
   propTypes: {
     co: PropTypes.object.isRequired
-    co_name: PropTypes.string.isRequired
+    vibration_ms: PropTypes.number.isRequired
     layout: PropTypes.string.isRequired
     is_nolog: PropTypes.bool.isRequired
 
     on_set_layout: PropTypes.func.isRequired
-    on_set_co: PropTypes.func.isRequired
     on_set_nolog: PropTypes.func.isRequired
   }
 
@@ -41,31 +68,35 @@ KbMore = cC {
     on_click = =>
       callback value
 
-    color = @props.co.TEXT_SEC
-    bg = @props.co.BG
+    view_style = [
+      s.button_view
+      @props.co.kb_more_button_view
+    ]
+    text_style = [
+      s.button_text
+      @props.co.kb_more_button_text
+    ]
     if (current is value) or (current is true)
-      color = @props.co.BG
-      bg = @props.co.TEXT_SEC
+      view_style.push @props.co.kb_more_button_view_active
+      text_style.push @props.co.kb_more_button_text_active
 
     (cE KbFlex, null,
       (cE Touch, {
         co: @props.co
         text: value
-        border: true
-        color
-        bg
+        view_style
+        text_style
         on_click
-        font_size: ss.TEXT_SIZE
         })
     )
 
   _render_nolog_notice: ->
     if @props.is_nolog
       (cE Text, {
-        style: {
-          fontSize: ss.TEXT_SIZE
-          color: @props.co.NOLOG
-        } },
+        style: [
+          s.nolog_text
+          @props.co.kb_more_nolog_text
+        ] },
         '无痕模式: 输入法不会记录任何用户输入.'
       )
 
@@ -83,42 +114,17 @@ KbMore = cC {
           # TODO
         } },
         (cE Text, {
-          style: {
-            fontSize: ss.TEXT_SIZE
-            color: @props.co.TEXT
-          } },
+          style: [
+            s.title_text
+            @props.co.kb_more_title
+          ] },
           '工作模式'
         )
         (cE View, {
-          style: {
-            flexDirection: 'row'
-            marginTop: ss.KB_PAD_V
-            height: 50  # TODO
-          } },
+          style: s.option_view
+          },
           @_render_one_button '普通模式', ! @props.is_nolog, @_on_set_mode_normal
           @_render_one_button '无痕模式', @props.is_nolog, @_on_set_mode_nolog
-        )
-      )
-      # set co
-      (cE View, {
-        style: {
-          # TODO
-        } },
-        (cE Text, {
-          style: {
-            fontSize: ss.TEXT_SIZE
-            color: @props.co.TEXT
-          } },
-          '颜色主题'
-        )
-        (cE View, {
-          style: {
-            flexDirection: 'row'
-            marginTop: ss.KB_PAD_V
-            height: 50  # TODO
-          } },
-          @_render_one_button 'dark', @props.co_name, @props.on_set_co
-          @_render_one_button 'light', @props.co_name, @props.on_set_co
         )
       )
       # set layout
@@ -127,18 +133,15 @@ KbMore = cC {
           # TODO
         } },
         (cE Text, {
-          style: {
-            fontSize: ss.TEXT_SIZE
-            color: @props.co.TEXT
-          } },
+          style: [
+            s.title_text
+            @props.co.kb_more_title
+          ] },
           '键盘布局'
         )
         (cE View, {
-          style: {
-            flexDirection: 'row'
-            marginTop: ss.KB_PAD_V
-            height: 50  # TODO
-          } },
+          style: s.option_view
+          },
           @_render_one_button 'qwerty', @props.layout, @props.on_set_layout
           @_render_one_button 'dvorak', @props.layout, @props.on_set_layout
           @_render_one_button 'abcd1097', @props.layout, @props.on_set_layout

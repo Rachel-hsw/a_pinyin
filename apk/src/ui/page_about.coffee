@@ -11,11 +11,13 @@ PropTypes = require 'prop-types'
   ScrollView
 } = require 'react-native'
 
-ss = require '../style'
 config = require '../config'
 
 {
   PageTop
+  ScrollPage
+
+  s
 } = require './sub'
 
 
@@ -46,83 +48,62 @@ PageAbout = cC {
     on_back: PropTypes.func.isRequired
   }
 
-  _about_content: ->
-    (cE View, {
-      style: {
-        flexDirection: 'column'
-        margin: ss.TOP_PADDING
-      } },
-      # name and page url
-      (cE Text, {
-        selectable: true
-        style: {
-          fontSize: ss.TITLE_SIZE
-          color: @props.co.TEXT
-          paddingBottom: ss.TOP_PADDING / 2
-        } },
-        "A拼音: 开源的 Android 拼音输入法"
-      )
-      (cE Text, {
-        selectable: true
-        style: {
-          fontSize: ss.TEXT_SIZE
-          color: @props.co.TEXT_SEC
-          paddingBottom: ss.TOP_PADDING / 2
-        } },
-        config.P_VERSION
-      )
-      (cE Text, {
-        selectable: true
-        style: {
-          fontSize: ss.TEXT_SIZE
-          color: @props.co.TEXT_SEC
-          paddingBottom: ss.TOP_PADDING / 2
-        } },
-        "https://coding.net/u/sceext2133/p/a_pinyin"
-      )
-      # license
-      (cE Text, {
-        style: {
-          fontSize: ss.TITLE_SIZE
-          color: @props.co.TEXT
-          paddingTop: ss.TOP_PADDING / 2
-          paddingBottom: ss.TOP_PADDING / 2
-        } },
-        "LICENSE"
-      )
-      (cE ScrollView, {
-        horizontal: true
-        },
-        (cE Text, {
-          selectable: true
-          style: {
-            fontSize: ss.TEXT_SIZE
-            color: @props.co.TEXT
-            backgroundColor: @props.co.BG_SEC
-            padding: ss.TOP_PADDING / 2
-          } },
-          LICENSE_TEXT
-        )
-      )
-    )
-
   render: ->
-    (cE View, {
-      style: {
-        flex: 1
-        flexDirection: 'column'
-      } },
-      (cE PageTop, {
+    (cE ScrollPage, {
+      co: @props.co
+      top: (cE PageTop, {
         co: @props.co
         text: '关于'
         on_back: @props.on_back
         })
-      (cE ScrollView, {
-        style: {
-          flex: 1
-          flexDirection: 'column'
-        } },
-        @_about_content()
+      margin: true
+      },
+      # name and page url
+      (cE Text, {
+        selectable: true
+        style: [
+          s.about_title_text_1
+          @props.co.ui_text
+        ] },
+        "A拼音: 开源的 Android 拼音输入法"
+      )
+      (cE Text, {
+        selectable: true
+        style: [
+          s.about_text
+          @props.co.ui_text_sec
+        ] },
+        config.P_VERSION
+      )
+      (cE Text, {
+        selectable: true
+        style: [
+          s.about_text
+          @props.co.ui_text_sec
+        ] },
+        "https://coding.net/u/sceext2133/p/a_pinyin"
+      )
+      # license
+      (cE Text, {
+        style: [
+          s.about_title_text
+          @props.co.ui_text
+        ] },
+        "LICENSE"
+      )
+      (cE View, null,  # FIXME not grow
+        (cE ScrollView, {
+          horizontal: true
+          },
+          (cE Text, {
+            selectable: true
+            style: [
+              s.about_license_text
+              @props.co.ui_license_text
+            ] },
+            LICENSE_TEXT
+          )
+        )
       )
     )
 }
