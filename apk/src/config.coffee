@@ -21,8 +21,8 @@ DB_CORE_DATA = '/sdcard/a_pinyin/core/core_data.db'
 DB_USER_DATA = '/sdcard/a_pinyin/user/user_data.db'
 
 DB_REMOTE_URL = {
-  'core_data.db': 'https://coding.net/u/sceext2133/p/a_pinyin/git/raw/db/1.0.0/core_data.db'
-  'user_data.db': 'https://coding.net/u/sceext2133/p/a_pinyin/git/raw/db/1.0.0/user_data.db'
+  'core_data.db': 'https://bitbucket.org/sceext2018/a_pinyin/raw/db/1.0.0/core_data.db'
+  'user_data.db': 'https://bitbucket.org/sceext2018/a_pinyin/raw/db/1.0.0/user_data.db'
 }
 DB_TMP_DIR = '/sdcard/a_pinyin/tmp'
 DB_TMP_SUFFIX = '.tmp'

@@ -75,13 +75,22 @@ PageAbout = cC {
         ] },
         config.P_VERSION
       )
+      # URLs for source code
       (cE Text, {
         selectable: true
         style: [
           s.about_text
           @props.co.ui_text_sec
         ] },
-        "https://coding.net/u/sceext2133/p/a_pinyin"
+        "https://bitbucket.org/sceext2018/a_pinyin/"
+      )
+      (cE Text, {
+        selectable: true
+        style: [
+          s.about_text
+          @props.co.ui_text_sec
+        ] },
+        "https://github.com/sceext2/a_pinyin"
       )
       # license
       (cE Text, {

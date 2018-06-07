@@ -1,9 +1,10 @@
-<!-- README.md, a_pinin/
+<!-- README.md, a_pinyin/
   lang: zh_CN
 -->
 
 # A拼音: 开源的 Android 拼音输入法
-<https://coding.net/u/sceext2133/p/a_pinyin>
+<https://bitbucket.org/sceext2018/a_pinyin/> <br />
+<https://github.com/sceext2/a_pinyin>
 
 
 ## LICENSE
