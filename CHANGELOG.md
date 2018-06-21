@@ -4,6 +4,22 @@
 # A拼音 更新日志
 
 
+## a_pinyin version 1.3.1 test20180621 2344
+
++ 增加镜像, 应对不稳定的复杂网络环境.
+
+  目前共有 4 个镜像: (含项目主页)
+
+  + <https://bitbucket.org/sceext2018/a_pinyin/>
+  + <https://github.com/sceext-mirror-201806/a_pinyin>
+  + <https://gitee.com/sceext2133/a_pinyin>
+  + <https://coding.net/u/sceext2133/p/a_pinyin>
+
++ 修复 (apk/UI): 下载数据库时可选择使用不同的镜像.
+
++ 修复 (apk/UI): 自定义输入 界面添加文本框的 placeholder 文本颜色.
+
+
 ## a_pinyin version 1.3.0 test20180621 0900
 
 + 转移项目代码至 [bitbucket.org](https://bitbucket.org/sceext2018/a_pinyin/)
