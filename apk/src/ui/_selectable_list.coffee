@@ -12,59 +12,12 @@ PropTypes = require 'prop-types'
   Text
   Button
 } = require 'react-native'
-{ default: IconF } = require 'react-native-vector-icons/Feather'
 
 s = require './_style'
+{
+  ListItem
+} = require './_sub'
 
-
-ListItem = cC {
-  displayName: 'ListItem'
-
-  propTypes: {
-    co: PropTypes.object.isRequired
-
-    text: PropTypes.string.isRequired
-    index: PropTypes.number.isRequired
-    is_selected: PropTypes.bool.isRequired
-
-    on_click: PropTypes.func.isRequired
-  }
-
-  _on_click: ->
-    @props.on_click @props.index
-
-  _render_right: ->
-    if @props.is_selected
-      (cE Text, {
-        style: @props.co.ui_text_sec
-        },
-        (cE IconF, {
-          name: 'check'
-          style: s.sl_list_item_right
-          })
-      )
-
-  render: ->
-    (cE TouchableNativeFeedback, {
-      onPress: @_on_click
-      background: @props.co.touch_ripple
-      },
-      (cE View, {
-        style: [
-          s.sl_list_item
-          @props.co.border
-        ] },
-        (cE Text, {
-          style: [
-            s.sl_list_item_text
-            @props.co.ui_text
-          ] },
-          "#{@props.text}"
-        )
-        @_render_right()
-      )
-    )
-}
 
 SelectableList = cC {
   displayName: 'SelectableList'

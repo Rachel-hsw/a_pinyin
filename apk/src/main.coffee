@@ -23,6 +23,7 @@ PageConfig = require './ui/page_config'
 PageConfigPost = require './ui/page_config_post'
 PageData = require './ui/page_data'
 PageDataUserSymbol2 = require './ui/page_data_user_symbol2'
+PageSelectMirror = require './ui/page_select_mirror'
 PageDb = require './ui/page_db'
 PageMain = require './ui/page_main'
 
@@ -77,6 +78,7 @@ Main = cC {
       #   'config_post'
       #   'data'
       #   'data_user_symbol2'
+      #   'select_mirror'
       #   'db'
       #   'main'
       #
@@ -107,7 +109,7 @@ Main = cC {
     page = switch @state.page
       when 'config_post'
         'config'
-      when 'data_user_symbol2', 'db'
+      when 'data_user_symbol2', 'select_mirror', 'db'
         'data'
       else  # default: go back to main page
         'main'
@@ -125,7 +127,6 @@ Main = cC {
       when 'about'
         (cE PageAbout, {
           co: @props.co
-
           on_back: @_on_back
           })
       when 'config'
@@ -138,7 +139,6 @@ Main = cC {
       when 'config_post'
         (cE PageConfigPost, {
           co: @props.co
-
           on_back: @_on_back
           })
       when 'data'
@@ -152,7 +152,11 @@ Main = cC {
       when 'data_user_symbol2'
         (cE PageDataUserSymbol2, {
           co: @props.co
-
+          on_back: @_on_back
+          })
+      when 'select_mirror'
+        (cE PageSelectMirror, {
+          co: @props.co
           on_back: @_on_back
           })
       when 'db'
@@ -165,7 +169,6 @@ Main = cC {
       when 'debug'
         (cE PageDebug, {
           co: @props.co
-
           on_back: @_on_back
           })
       else  # 'main'

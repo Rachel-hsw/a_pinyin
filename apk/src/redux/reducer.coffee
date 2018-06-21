@@ -18,6 +18,8 @@ reducer = ($$state, action) ->
     #when ac.A_RESET_UI  # TODO
     when ac.A_SET_LAYOUT
       $$o = $$o.set 'layout', action.payload
+    when ac.A_SET_DL_MIRROR
+      $$o = $$o.set 'dl_mirror', action.payload
 
     when ac.PINYIN_RESET
       $$o = $$o.set 'pinyin', Immutable.fromJS(state.pinyin)

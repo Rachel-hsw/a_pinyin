@@ -74,6 +74,9 @@ init_state = {
     list: []
     is_loading: false
   }
+
+  # mirror to download databases
+  dl_mirror: 'bitbucket.org'  # default: bitbucket
 }
 
 module.exports = init_state

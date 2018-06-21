@@ -121,7 +121,11 @@ PageDataUserSymbol2 = cC {
             @props.co.ui_text
           ]
           placeholder: '在此输入文本'
+          placeholderTextColor: @props.co.co.BG_SEC
           value: @state.text
+          autoCapitalize: 'none'
+          autoCorrect: false
+          autoFocus: true
           onChangeText: @_on_change_text
           onSubmitEditing: @_on_add
           })

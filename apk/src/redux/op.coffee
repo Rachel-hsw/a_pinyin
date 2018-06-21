@@ -140,7 +140,6 @@ pinyin_add_char = (c) ->
     new_pinyin = old_pinyin + c
 
     # TODO add pinyin char if wait is not empty ?
-
     await dispatch _update_pinyin(new_pinyin)
 
 pinyin_delete = ->
@@ -400,12 +399,14 @@ dl_db = ->
 
 _dl_db = ->
   (dispatch, getState) ->
+    mirror = getState().get 'dl_mirror'
+
     # core_data.db
     if ! await RNFetchBlob.fs.exists(config.DB_CORE_DATA)
-      await _dl_one_db config.DB_CORE_DATA, config.DB_REMOTE_URL['core_data.db'], ' core_data.db A拼音 核心数据库'
+      await _dl_one_db config.DB_CORE_DATA, config.DB_REMOTE_URL[mirror]['core_data.db'], " core_data.db A拼音 核心数据库 (#{mirror})"
     # user_data.db
     if ! await RNFetchBlob.fs.exists(config.DB_USER_DATA)
-      await _dl_one_db config.DB_USER_DATA, config.DB_REMOTE_URL['user_data.db'], ' user_data.db A拼音 用户数据库'
+      await _dl_one_db config.DB_USER_DATA, config.DB_REMOTE_URL[mirror]['user_data.db'], " user_data.db A拼音 用户数据库 (#{mirror})"
 
 _ensure_parent_dir = (p) ->
   parent = path.dirname(p)
