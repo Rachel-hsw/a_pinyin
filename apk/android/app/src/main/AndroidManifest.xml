@@ -44,5 +44,8 @@
       android:name=".BgJsService"
       android:exported="false"
       android:label="For headless background js task" />
+    <service
+      android:name=".PostService"
+      android:label="a_pinyin post service" />
   </application>
 </manifest>

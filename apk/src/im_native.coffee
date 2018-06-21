@@ -150,6 +150,19 @@ exit_app = ->
   # never got here !
   throw new Error "exit failed"
 
+
+# data_user_symbol2
+dus2_list = ->
+  raw = await _n.data_us2_list()
+  JSON.parse raw
+
+dus2_add = (text) ->
+  await _n.data_us2_add(text)
+
+dus2_rm = (list) ->
+  j = JSON.stringify list
+  await _n.data_us2_rm(j)
+
 module.exports = {
   A_PINYIN_NATIVE_EVENT
 
@@ -190,4 +203,8 @@ module.exports = {
   core_clean_user_db  # async
   core_get_db_info  # async
   exit_app  # async
+
+  dus2_list  # async
+  dus2_add  # async
+  dus2_rm  # async
 }

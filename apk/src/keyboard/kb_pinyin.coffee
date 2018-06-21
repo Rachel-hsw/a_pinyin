@@ -1,15 +1,17 @@
 # kb_pinyin.coffee, a_pinyin/apk/src/keyboard/
 
-{ createElement: cE } = require 'react'
+React = require 'react'
+{ createElement: cE } = React
 cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
   View
-  Text
 } = require 'react-native'
 
-style = require '../style'
+{
+  KB_TOP_HEIGHT
+} = require '../style'
 
 KbTop = require './kb_top'
 KbTopPinyin = require './kb_top_pinyin'
@@ -39,11 +41,16 @@ KbPinyin = cC {
   propTypes: {
     co: PropTypes.object.isRequired
     vibration_ms: PropTypes.number.isRequired
+    size_x: PropTypes.number.isRequired
+    size_y: PropTypes.number.isRequired
     layout: PropTypes.string.isRequired
     core_nolog: PropTypes.bool.isRequired
 
     pinyin: PropTypes.string.isRequired
-    list: PropTypes.array.isRequired
+    # top candidates Chinese text list
+    list: PropTypes.arrayOf(PropTypes.arrayOf(
+      PropTypes.string
+    )).isRequired
     top_more: PropTypes.bool.isRequired
 
     on_set_top_more: PropTypes.func.isRequired
@@ -57,6 +64,14 @@ KbPinyin = cC {
     on_pinyin_delete: PropTypes.func.isRequired
     on_pinyin_select_item: PropTypes.func.isRequired
   }
+
+  componentWillMount: ->
+    @_ref_pinyin_more = React.createRef()
+
+  _on_pinyin_select_item: (text) ->
+    @props.on_pinyin_select_item text
+    # try scroll to top
+    @_ref_pinyin_more.current?.scroll_to_top()
 
   _on_top_more: ->
     @props.on_set_top_more true
@@ -79,7 +94,8 @@ KbPinyin = cC {
         co: @props.co
         vibration_ms: @props.vibration_ms
         list
-        on_text: @props.on_pinyin_select_item
+        no_more: @props.top_more
+        on_text: @_on_pinyin_select_item
         on_more: @_on_top_more
 
         key: 1
@@ -96,13 +112,18 @@ KbPinyin = cC {
         key: 1
         })
 
+  _get_size_y: ->
+    @props.size_y - KB_TOP_HEIGHT
+
   _render_body: ->
     if @props.top_more
       (cE KbPinyinMore, {
         co: @props.co
         vibration_ms: @props.vibration_ms
+        size_x: @props.size_x
+        size_y: @_get_size_y()
         list: @props.list
-        on_text: @props.on_pinyin_select_item
+        on_text: @_on_pinyin_select_item
         on_reset: @props.on_reset
         on_back: @_on_more_back
 
@@ -112,6 +133,8 @@ KbPinyin = cC {
       (cE KbEnglish, {
         co: @props.co
         vibration_ms: @props.vibration_ms
+        size_x: @props.size_x
+        size_y: @_get_size_y()
         layout: @props.layout
         no_shift: true
         on_shift: @props.on_reset  # shift key is 'reset' key here

@@ -6,15 +6,26 @@ PropTypes = require 'prop-types'
 
 {
   View
-  ScrollView
+  FlatList
+  Text
 } = require 'react-native'
+{ default: IconM } = require 'react-native-vector-icons/MaterialCommunityIcons'
 
-{ ss } = require '../style'
 {
-  Touch
-  KbFlex
-} = require './_kb_sub'
-config = require '../config'
+  KB_PAD_V
+} = require '../style'
+s = require './_kb_style'
+{
+  SimpleTouch
+  KbSecIconButton
+} = require './_kb_key'
+{
+  S2_TYPE_TEXT
+  S2_TYPE_PASTE
+  S2_TYPE_PLACEHOLDER
+
+  calc_symbol2
+} = require './_kb_util'
 
 
 KbSymbol2 = cC {
@@ -22,62 +33,137 @@ KbSymbol2 = cC {
   propTypes: {
     co: PropTypes.object.isRequired
     vibration_ms: PropTypes.number.isRequired
-    list: PropTypes.array.isRequired
+    size_x: PropTypes.number.isRequired
+    size_y: PropTypes.number.isRequired
+    # TODO more meta-data on list ?
+    list: PropTypes.arrayOf(PropTypes.string).isRequired
+    measured_width: PropTypes.arrayOf(PropTypes.number).isRequired
 
     on_text: PropTypes.func.isRequired
+    on_clip_paste: PropTypes.func.isRequired
     reload: PropTypes.func.isRequired
   }
 
   componentWillUnmount: ->
     @props.reload()
 
-  _render_one: (text, key) ->
-    on_click = =>
-      @props.on_text text
+  _gen_layouts_data: ->
+    size_x = @props.size_x
+    size_y = @props.size_y - KB_PAD_V
+    # for top gap
+    calc_symbol2 size_x, size_y, @props.list, @props.measured_width
 
-    (cE KbFlex, {
-      key
-      },
-      (cE Touch, {
-        co: @props.co
-        vibration_ms: @props.vibration_ms
-        text
-        on_click
+  # i: index (key)
+  # one: PropTypes.shape {
+  #   # one item (button) to render
+  #
+  #   type: PropTypes.string.isRequired
+  #   # type can be one of
+  #   #   'text': normal text symbol
+  #   #   'paste': the clip-paste button
+  #   #   '': placeholder (else type, default)
+  #
+  #   # size (width)
+  #   flex: PropTypes.number.isRequired
+  #   height: PropTypes.number.isRequired  # FIXME height to render
+  #
+  #   # only for type: 'text'
+  #   text: PropTypes.string  # text to display
+  #   text_cb: PropTypes.string  # optional override on_text() callback value
+  #
+  #   color: PropTypes.string
+  #   # set text color, can be one of
+  #   #   null: default color (text)
+  #   #   'sec': text_sec color
+  #   #   'nolog': use nolog text color
+  #
+  #   bold: PropTypes.bool  # set bold text
+  # }
+  _render_one: (i, one) ->
+    # merge styles
+    style = [
+      # TODO
+      # view layout style
+      {
+        flex: one.flex
+        height: one.height
+      }
+    ]
+    style_text = {
+      # TODO support color and bold
+    }
+
+    switch one.type
+      when S2_TYPE_TEXT
+        (cE SimpleTouch, {
+          key: i
+          co: @props.co
+          vibration_ms: @props.vibration_ms
+          style_view: style
+          style: style_text
+          text: one.text
+          text_cb: one.text_cb
+          on_click: @props.on_text
+          })
+      when S2_TYPE_PASTE
+        (cE KbSecIconButton, {
+          key: i
+          co: @props.co
+          vibration_ms: @props.vibration_ms
+          style
+          on_click: @props.on_clip_paste
+          },
+          (cE IconM, {  # MaterialCommunityIcons
+            style: s.st
+            name: 'content-paste'
+            })
+        )
+      else  # default S2_TYPE_PLACEHOLDER
+        (cE View, {
+          key: i
+          style
+          })
+
+  # render one line in FlatList
+  _render_one_line: (it) ->
+    {
+      item
+      index
+    } = it
+    # special render first line (top pad)
+    if index is 0
+      (cE View, {
+        style: s.m_pad
         })
-    )
+    else
+      o = []
+      for i in [0... item.length]
+        o.push @_render_one(i, item[i])
 
-  _render_one_line: (raw, i) ->
-    b = []
-    for j in [0... config.SYMBOL_PER_LINE]
-      if (i + j) >= raw.length
-        b.push (cE KbFlex, { key: i + j })  # placeholder
-      else
-        b.push @_render_one(raw[i + j], i + j)
-
-    (cE View, {
-      key: i
-      style: ss.kb_sym_line_view
-      },
-      b
-    )
+      (cE View, {
+        style: s.sy_line
+        },
+        o
+      )
 
   render: ->
-    raw = @props.list  # support dynamic order
-    lines = []
-    i = 0
-    while i < raw.length
-      lines.push @_render_one_line(raw, i)
-      i += config.SYMBOL_PER_LINE
+    data = @_gen_layouts_data()
 
-    # support scroll here
-    (cE ScrollView, {
-      style: ss.kb_scrollview
+    (cE View, {
+      style: s.m_flex
       },
-      (cE View, {
-        style: ss.kb_view
-        },
-        lines
-      )
+      # render lines as list
+      (cE FlatList, {
+        data
+        renderItem: @_render_one_line
+        extraData: {
+          co: @props.co
+          vibration_ms: @props.vibration_ms
+        }
+        keyExtractor: (item, index) ->
+          "#{index}"
+        style: s.flatlist
+      })
     )
 }
 

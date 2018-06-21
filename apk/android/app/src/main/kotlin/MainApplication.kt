@@ -12,6 +12,7 @@ import com.facebook.react.shell.MainReactPackage
 import com.facebook.soloader.SoLoader
 
 import com.RNFetchBlob.RNFetchBlobPackage
+import io.github.airamrguez.RNMeasureTextPackage
 
 
 // save MainApplication instance
@@ -31,6 +32,7 @@ class MainApplication : Application(), ReactApplication {
             return Arrays.asList(
                 MainReactPackage(),
                 RNFetchBlobPackage(),
+                RNMeasureTextPackage(),
                 ImPackage()
             )
         }

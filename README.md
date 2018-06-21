@@ -4,7 +4,7 @@
 
 # A拼音: 开源的 Android 拼音输入法
 <https://bitbucket.org/sceext2018/a_pinyin/> <br />
-<https://github.com/sceext2/a_pinyin>
+<https://github.com/sceext-mirror-201806/a_pinyin>
 
 
 ## LICENSE

@@ -5,45 +5,14 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
-  StyleSheet
-
   View
   Text
 } = require 'react-native'
 
-style = require '../style'
-
+s = require './_kb_style'
 {
-  Touch
-  KbFlex
-} = require './_kb_sub'
-
-{
-  ss
-} = style
-# local styles
-s = StyleSheet.create {
-  button_view: {
-    borderWidth: style.BORDER_WIDTH / 2
-  }
-  button_text: {
-    fontSize: style.TEXT_SIZE
-  }
-
-  nolog_text: {
-    fontSize: style.TEXT_SIZE
-  }
-
-  title_text: {
-    fontSize: style.TEXT_SIZE
-  }
-
-  option_view: {
-    flexDirection: 'row'
-    marginTop: style.KB_PAD_V
-    height: 50  # TODO
-  }
-}
+  SimpleTouch
+} = require './_kb_key'
 
 
 KbMore = cC {
@@ -68,24 +37,26 @@ KbMore = cC {
     on_click = =>
       callback value
 
-    view_style = [
-      s.button_view
-      @props.co.kb_more_button_view
-    ]
-    text_style = [
-      s.button_text
+    style = [  # Text
+      s.m_button_text
       @props.co.kb_more_button_text
     ]
+    style_view = [
+      s.m_button
+      @props.co.kb_more_button_view
+    ]
     if (current is value) or (current is true)
-      view_style.push @props.co.kb_more_button_view_active
-      text_style.push @props.co.kb_more_button_text_active
+      style.push @props.co.kb_more_button_text_active
+      style_view.push @props.co.kb_more_button_view_active
 
-    (cE KbFlex, null,
-      (cE Touch, {
+    (cE View, {
+      style: s.m_flex
+      },
+      (cE SimpleTouch, {
         co: @props.co
+        style
+        style_view
         text: value
-        view_style
-        text_style
         on_click
         })
     )
@@ -94,34 +65,34 @@ KbMore = cC {
     if @props.is_nolog
       (cE Text, {
         style: [
-          s.nolog_text
+          s.m_text_nolog
           @props.co.kb_more_nolog_text
         ] },
         '无痕模式: 输入法不会记录任何用户输入.'
       )
 
+  _render_title: (text) ->
+    (cE Text, {
+      style: [
+        s.m_text_title
+        @props.co.kb_more_title
+      ] },
+      text
+    )
+
   render: ->
     (cE View, {
-      style: {
-        # TODO
-      } },
-      # TODO TODO support scroll ?
+      style: s.kb_view
+      },  # no scroll here
 
       @_render_nolog_notice()
       # set nolog
       (cE View, {
-        style: {
-          # TODO
-        } },
-        (cE Text, {
-          style: [
-            s.title_text
-            @props.co.kb_more_title
-          ] },
-          '工作模式'
-        )
+        style: s.m_pad
+        },
+        @_render_title '工作模式'
         (cE View, {
-          style: s.option_view
+          style: s.m_option
           },
           @_render_one_button '普通模式', ! @props.is_nolog, @_on_set_mode_normal
           @_render_one_button '无痕模式', @props.is_nolog, @_on_set_mode_nolog
@@ -129,18 +100,11 @@ KbMore = cC {
       )
       # set layout
       (cE View, {
-        style: {
-          # TODO
-        } },
-        (cE Text, {
-          style: [
-            s.title_text
-            @props.co.kb_more_title
-          ] },
-          '键盘布局'
-        )
+        style: s.m_pad
+        },
+        @_render_title '键盘布局'
         (cE View, {
-          style: s.option_view
+          style: s.m_option
           },
           @_render_one_button 'qwerty', @props.layout, @props.on_set_layout
           @_render_one_button 'dvorak', @props.layout, @props.on_set_layout
@@ -148,7 +112,6 @@ KbMore = cC {
           @_render_one_button 'abcd7109', @props.layout, @props.on_set_layout
         )
       )
-      # TODO
     )
 }
 

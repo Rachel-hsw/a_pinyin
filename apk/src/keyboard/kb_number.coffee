@@ -5,81 +5,18 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
-  StyleSheet
-
   View
-  Text
 } = require 'react-native'
 
-style = require '../style'
-
+s = require './_kb_style'
 {
-  Touch
-  KbFlex
-  KbLine
-  KbSpaceButton
+  TEXT_KEY_ENTER
+
+  SimpleTouch
+  KbSecButton
   KbDeleteKey
-  KbEnterKey
-} = require './_kb_sub'
+} = require './_kb_key'
 
-{
-  ss
-} = style
-# local styles
-s = StyleSheet.create {
-  kb_view: {
-    flexDirection: 'row'
-  }
-
-  view_left: {
-    flex: 1
-  }
-  view_main: {
-    width: style.KB_NUMBER_WIDTH
-    flexShrink: 0
-  }
-  flex_right: {
-    flex: style.KB_NUMBER_RIGHT_BUTTON_FLEX
-  }
-}
-
-
-TextButton = cC {
-  displayName: 'TextButton'
-  propTypes: {
-    co: PropTypes.object.isRequired
-    vibration_ms: PropTypes.number.isRequired
-    text: PropTypes.string.isRequired
-    char: PropTypes.string.isRequired
-    is_second: PropTypes.bool
-    no_flex: PropTypes.bool
-
-    on_text: PropTypes.func.isRequired
-  }
-
-  _on_click: ->
-    @props.on_text @props.char
-
-  render: ->
-    text_style = []
-    if @props.is_second
-      text_style.push @props.co.kb_sec_text
-
-    touch = (cE Touch, {
-      co: @props.co
-      vibration_ms: @props.vibration_ms
-      text: @props.text
-      text_style
-      on_click: @_on_click
-      })
-
-    if @props.no_flex
-      touch
-    else
-      (cE KbFlex, null,
-        touch
-      )
-}
 
 KbNumber = cC {
   displayName: 'KbNumber'
@@ -92,105 +29,125 @@ KbNumber = cC {
     on_key_enter: PropTypes.func.isRequired
   }
 
-  _render_button: (text, char, is_second, no_flex) ->
-    (cE TextButton, {
+  _on_click_space: ->
+    @props.on_text ' '
+
+  _render_button_main: (text) ->
+    (cE SimpleTouch, {
       co: @props.co
       vibration_ms: @props.vibration_ms
+      style_view: s.n_button
       text
-      char
-      is_second
-      no_flex
-
-      on_text: @props.on_text
+      on_click: @props.on_text
       })
+
+  _render_button_sec: (text) ->
+    style = [
+      @props.co.kb_sec_text
+    ]
+    (cE SimpleTouch, {
+      co: @props.co
+      vibration_ms: @props.vibration_ms
+      style
+      style_view: s.n_button
+      text
+      on_click: @props.on_text
+      })
+
+  _render_space: ->
+    (cE KbSecButton, {
+      co: @props.co
+      vibration_ms: @props.vibration_ms
+      style: s.n_button
+      text: ''  # space button, without text
+      on_click: @_on_click_space
+      })
+
+  _render_enter: ->
+    (cE KbSecButton, {
+      co: @props.co
+      vibration_ms: @props.vibration_ms
+      style: s.n_button
+      text: TEXT_KEY_ENTER
+      on_click: @props.on_key_enter
+      })
+
+  _render_left: ->
+    (cE View, {
+      style: s.n_left
+      },
+      @_render_button_sec '+'
+      @_render_button_sec '-'
+      @_render_button_sec '*'
+      @_render_button_sec '/'
+    )
+
+  _render_main: ->
+    (cE View, {
+      style: s.n_main
+      },
+      # line 1
+      (cE View, {
+        style: s.n_main_line
+        },
+        @_render_button_main '7'
+        @_render_button_main '8'
+        @_render_button_main '9'
+      )
+      # line 2
+      (cE View, {
+        style: s.n_main_line
+        },
+        @_render_button_main '4'
+        @_render_button_main '5'
+        @_render_button_main '6'
+      )
+      # line 3
+      (cE View, {
+        style: s.n_main_line
+        },
+        @_render_button_main '1'
+        @_render_button_main '2'
+        @_render_button_main '3'
+      )
+      # line 4
+      (cE View, {
+        style: s.n_main_line
+        },
+        @_render_button_main '0'
+        @_render_space()
+        @_render_button_main '.'
+      )
+    )
+
+  _render_right: ->
+    (cE View, {
+      style: s.n_right
+      },
+      # delete key
+      (cE KbDeleteKey, {
+        co: @props.co
+        vibration_ms: @props.vibration_ms
+        style: s.n_button
+        on_delete: @props.on_key_delete
+        })
+      @_render_button_sec '%'
+      @_render_button_sec ','
+      @_render_enter()
+    )
 
   render: ->
     (cE View, {
       style: [
-        ss.kb_view
         s.kb_view
+        s.n_view
       ] },
-      # left part
+      @_render_left()
       (cE View, {
-        style: s.view_left
+        style: s.n_right_part
         },
-        # add '+', '-', '*', '/' buttons here
-        (cE KbLine, null,
-          @_render_button '+', '+', true
-        )
-        (cE KbLine, null,
-          @_render_button '-', '-', true
-        )
-        (cE KbLine, null,
-          @_render_button '*', '*', true
-        )
-        (cE KbLine, null,
-          @_render_button '/', '/', true
-        )
-      )
-      # main part
-      (cE View, {
-        style: s.view_main
-        },
-        (cE KbLine, null,
-          @_render_button '7', '7'
-          @_render_button '8', '8'
-          @_render_button '9', '9'
-          # delete key
-          (cE KbFlex, {
-            style: s.flex_right
-            },
-            (cE KbDeleteKey, {
-              co: @props.co
-              vibration_ms: @props.vibration_ms
-              on_delete: @props.on_key_delete
-              })
-          )
-        )
-        (cE KbLine, null,
-          @_render_button '4', '4'
-          @_render_button '5', '5'
-          @_render_button '6', '6'
-          # '%' button here
-          (cE KbFlex, {
-            style: s.flex_right
-            },
-            @_render_button '%', '%', true, true
-          )
-        )
-        (cE KbLine, null,
-          @_render_button '1', '1'
-          @_render_button '2', '2'
-          @_render_button '3', '3'
-          # ',' button here
-          (cE KbFlex, {
-            style: s.flex_right
-            },
-            @_render_button ',', ',', true, true
-          )
-        )
-        (cE KbLine, null,
-          @_render_button '0', '0'
-          # space button
-          (cE KbFlex, null,
-            (cE KbSpaceButton, {
-              co: @props.co
-              vibration_ms: @props.vibration_ms
-              on_text: @props.on_text
-              })
-          )
-          @_render_button '.', '.'
-          # enter key
-          (cE KbFlex, {
-            style: s.flex_right
-            },
-            (cE KbEnterKey, {
-              co: @props.co
-              vibration_ms: @props.vibration_ms
-              on_click: @props.on_key_enter
-              })
-          )
-        )
+        @_render_main()
+        @_render_right()
       )
     )
 }

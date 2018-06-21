@@ -14,12 +14,11 @@ PropTypes = require 'prop-types'
 config = require '../config'
 im_native = require '../im_native'
 
+s = require './_style'
 {
   PageTop
   ScrollPage
-
-  s
-} = require './sub'
+} = require './_sub'
 
 
 PageDb = cC {
@@ -27,8 +26,8 @@ PageDb = cC {
 
   propTypes: {
     co: PropTypes.object.isRequired
-
     no_check_db: PropTypes.bool.isRequired
+
     db: PropTypes.object.isRequired
 
     on_check_db: PropTypes.func.isRequired
@@ -139,7 +138,7 @@ PageDb = cC {
       co: @props.co
       top: (cE PageTop, {
         co: @props.co
-        text: '数据'
+        text: '数据库'
         on_back: @props.on_back
         })
       margin: true

@@ -5,19 +5,17 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
-  StyleSheet
-
   View
-  Text
 } = require 'react-native'
 
-{ ss } = require '../style'
-
+{
+  KB_PAD_V
+} = require '../style'
+s = require './_kb_style'
 {
   KbLayouts1097
   KbLayouts7109
-  KbLineBottom
-} = require './_kb_sub'
+} = require './_kb_board'
 
 KB_LAYOUTS_QWERTY = [  # layouts 1097
   'qQwWeErRtTyYuUiIoOpP'
@@ -47,6 +45,8 @@ KbEnglish = cC {
     co: PropTypes.object.isRequired
     vibration_ms: PropTypes.number.isRequired
 
+    size_x: PropTypes.number.isRequired
+    size_y: PropTypes.number.isRequired
     layout: PropTypes.string.isRequired
     no_shift: PropTypes.bool
 
@@ -82,31 +82,27 @@ KbEnglish = cC {
         [KB_LAYOUTS_ABCD7109, KbLayouts7109]
 
   render: ->
-    [layouts, Layout] = @_get_layout()
+    [ layouts, KbLayouts ] = @_get_layout()
     shift = @state.shift
     if @props.no_shift
       shift = null
+    size_x = @props.size_x
+    size_y = @props.size_y - KB_PAD_V
 
     (cE View, {
-      style: ss.kb_view
+      style: s.kb_view  # KB_PAD_V here
       },
-      # main keyboard buttons
-      (cE Layout, {
+      (cE KbLayouts, {
         co: @props.co
         vibration_ms: @props.vibration_ms
         shift
         layouts
+        size_x
+        size_y
 
         on_text: @props.on_text
         on_shift: @_on_shift
         on_key_delete: @props.on_key_delete
-        })
-      # button line
-      (cE KbLineBottom, {
-        co: @props.co
-        vibration_ms: @props.vibration_ms
-        shift
-        on_text: @props.on_text
         on_key_enter: @props.on_key_enter
         })
     )

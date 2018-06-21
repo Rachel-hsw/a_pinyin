@@ -31,6 +31,10 @@ import org.sceext.a_pinyin.core.INPUT_MODE_PINYIN
 import org.sceext.a_pinyin.core.clean_user_db
 import org.sceext.a_pinyin.core.get_db_info
 
+import org.sceext.a_pinyin.core.dus2_list
+import org.sceext.a_pinyin.core.dus2_add
+import org.sceext.a_pinyin.core.dus2_rm
+
 
 const val MODULE_NAME: String = "im_native"
 
@@ -273,6 +277,31 @@ class ImNative : ReactContextBaseJavaModule {
 
         System.exit(0)
         // never got here
+        promise.resolve(true)
+    }
+
+    @ReactMethod
+    fun data_us2_list(promise: Promise) {
+        val r = dus2_list()
+        val o = json {
+            array(r)
+        }
+        promise.resolve(o.toJsonString())
+    }
+
+    @ReactMethod
+    fun data_us2_add(text: String, promise: Promise) {
+        dus2_add(text)
+        // TODO error process ?
+        promise.resolve(true)
+    }
+
+    @ReactMethod
+    fun data_us2_rm(list_json: String, promise: Promise) {
+        // TODO parse json error ?
+        val raw = parse_json_array<String>(list_json)
+        dus2_rm(raw)
+        // TODO error process ?
         promise.resolve(true)
     }
 }

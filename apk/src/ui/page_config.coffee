@@ -12,16 +12,14 @@ PropTypes = require 'prop-types'
   Switch
 } = require 'react-native'
 
-config = require '../config'
 # for core config
 im_native = require '../im_native'
 
+s = require './_style'
 {
   PageTop
   ScrollPage
-
-  s
-} = require './sub'
+} = require './_sub'
 
 
 ConfigItem = cC {
@@ -32,7 +30,7 @@ ConfigItem = cC {
 
     text: PropTypes.string.isRequired
     text_sec: PropTypes.string.isRequired
-    #children: right control
+    children: PropTypes.node  # right control
   }
 
   render: ->
@@ -84,11 +82,15 @@ PageConfig = cC {
     on_set_vibration_ms: PropTypes.func.isRequired
     on_change_core_level: PropTypes.func.isRequired
 
+    on_show_page: PropTypes.func.isRequired
     on_back: PropTypes.func.isRequired
   }
 
   componentDidMount: ->
     @props.on_init()
+
+  _on_show_page_post: ->
+    @props.on_show_page 'config_post'
 
   _on_change_theme: ->
     @props.on_change_theme(! @props.is_light_theme)

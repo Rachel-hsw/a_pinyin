@@ -5,40 +5,18 @@ cC = require 'create-react-class'
 PropTypes = require 'prop-types'
 
 {
-  StyleSheet
-
   View
-  Text
 } = require 'react-native'
 
-style = require '../style'
-{
-  Touch
-} = require './_kb_sub'
 config = require '../config'
-
 {
-  ss
-} = style
-# local styles
-s = StyleSheet.create {
-  text: {
-    fontSize: style.TITLE_SIZE
-  }
-  view: {
-    height: '100%'
-  }
-  right_view: {
-    height: '100%'
-    width: style.KB_TOP_WIDTH
-  }
-
-  kb_view: {
-    flex: 1
-    flexDirection: 'row'
-  }
-  # TODO
-}
+  KB_TOP_WIDTH
+  TITLE_SIZE
+} = require '../style'
+s = require './_kb_style'
+{
+  SimpleTouch
+} = require './_kb_key'
 
 
 KbTopPinyin = cC {
@@ -47,36 +25,32 @@ KbTopPinyin = cC {
     co: PropTypes.object.isRequired
     vibration_ms: PropTypes.number.isRequired
 
-    list: PropTypes.array.isRequired
+    list: PropTypes.arrayOf(PropTypes.string).isRequired
+    no_more: PropTypes.bool.isRequired  # not show more button
 
     on_text: PropTypes.func.isRequired
     on_more: PropTypes.func.isRequired
   }
 
   _render_one: (text, i) ->
-    on_click = =>
-      @props.on_text text
     # calc cell width
-    top_width = style.KB_TOP_WIDTH
-    font_size = style.TITLE_SIZE
+    top_width = KB_TOP_WIDTH
+    font_size = TITLE_SIZE
     width = (top_width - font_size) + font_size * text.length
 
-    (cE View, {
+    style_view = {
+      width
+    }
+
+    (cE SimpleTouch, {
       key: i
-      style: [
-        s.view
-        {
-          width
-        }
-      ] },
-      (cE Touch, {
-        co: @props.co
-        vibration_ms: @props.vibration_ms
-        text
-        text_style: s.text
-        on_click
-        })
-    )
+      co: @props.co
+      vibration_ms: @props.vibration_ms
+      style: s.tp_text
+      style_view
+      text: text
+      on_click: @props.on_text
+      })
 
   _render_list: ->
     o = []
@@ -85,37 +59,38 @@ KbTopPinyin = cC {
     o
 
   _render_more: ->
-    text_style = [
-      s.text
+    style = [  # Text
+      s.tp_text
       @props.co.kb_sec_text
     ]
-    # not show more button if list is empty
-    if @props.list.length < 1
+    # not show more button if no_more or list is empty
+    if @props.no_more or (@props.list.length < 1)
       (cE View, {
-        style: s.right_view
+        style: s.tp_right
         })
     else
-      (cE View, {
-        style: s.right_view
-        },
-        (cE Touch, {
-          co: @props.co
-          vibration_ms: @props.vibration_ms
-          text: '>'
-          text_style
-          on_click: @props.on_more
-          })
-      )
+      (cE SimpleTouch, {
+        co: @props.co
+        vibration_ms: @props.vibration_ms
+        style
+        style_view: [
+          s.tp_right
+          @props.co.kb_top_pinyin_right
+        ]
+        text: '>'
+        on_click: @props.on_more
+        })
 
   render: ->
     (cE View, {
       style: [
-        ss.kb_top_view
+        s.kb_top
         @props.co.border
       ] },
+      # TODO use scroll view here ?
       # input list to select
       (cE View, {
-        style: s.kb_view
+        style: s.tp_view
         },
         @_render_list()
       )

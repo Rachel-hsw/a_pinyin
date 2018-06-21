@@ -33,6 +33,8 @@ init_state = {
   user: {
     symbol: []
     symbol2: []
+    # measured text width for symbol2
+    measured_width: []
   }
 
   # database status
@@ -65,6 +67,12 @@ init_state = {
   config: {
     vibration_ms: 20  # default: 20 ms
     core_level: null
+  }
+
+  # data_user_symbol2
+  dus2: {
+    list: []
+    is_loading: false
   }
 }
 

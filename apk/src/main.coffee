@@ -6,7 +6,6 @@ PropTypes = require 'prop-types'
 
 {
   View
-  Text
 
   DeviceEventEmitter
   PermissionsAndroid
@@ -19,11 +18,15 @@ Subscribable = require 'Subscribable'
 
 im_native = require './im_native'
 
-PageMain = require './ui/page_main'
 PageAbout = require './ui/page_about'
-PageDebug = require './ui/page_debug'
-PageDb = require './ui/page_db'
 PageConfig = require './ui/page_config'
+PageConfigPost = require './ui/page_config_post'
+PageData = require './ui/page_data'
+PageDataUserSymbol2 = require './ui/page_data_user_symbol2'
+PageDb = require './ui/page_db'
+PageMain = require './ui/page_main'
+
+PageDebug = require './ui/page_debug'
 
 
 _check_permissions = ->
@@ -67,34 +70,28 @@ Main = cC {
 
   getInitialState: ->
     {
-      page: 'main'  # 'main', 'about', 'debug', 'db', 'config'
+      page: 'main'  # current page
+      # avaliable pages:
+      #   'about'
+      #   'config'
+      #   'config_post'
+      #   'data'
+      #   'data_user_symbol2'
+      #   'db'
+      #   'main'
+      #
+      #   'debug'
       no_check_db: false
     }
 
-  _on_hardware_back: ->
-    switch @state.page
-      when 'main'
-        return false  # exit app
-      else  # default: go back to main page
-        @_on_show_page_main()
-    true
-
-  _on_show_page_main: ->
+  # go to one page
+  _on_show_page: (page) ->
     @setState {
-      page: 'main'
+      page
       no_check_db: false  # reset no_check_db here
     }
 
-  _on_show_page_about: ->
-    @setState {
-      page: 'about'
-    }
-
-  _on_show_page_debug: ->
-    @setState {
-      page: 'debug'
-    }
-
+  # db is one special page
   _on_show_page_db: (no_check) ->
     no_check_db = false
     if no_check is true
@@ -105,10 +102,23 @@ Main = cC {
       no_check_db
     }
 
-  _on_show_page_config: ->
-    @setState {
-      page: 'config'
-    }
+  # hardware_back or touch go back
+  _on_back: ->
+    page = switch @state.page
+      when 'config_post'
+        'config'
+      when 'data_user_symbol2', 'db'
+        'data'
+      else  # default: go back to main page
+        'main'
+    @_on_show_page page
+
+  _on_hardware_back: ->
+    if @state.page is 'main'
+      return false  # exit app
+    else  # default: go back to upper page
+      @_on_back()
+    true
 
   _render_page: ->
     switch @state.page
@@ -116,35 +126,53 @@ Main = cC {
         (cE PageAbout, {
           co: @props.co
 
-          on_back: @_on_show_page_main
+          on_back: @_on_back
           })
-      when 'debug'
-        (cE PageDebug, {
+      when 'config'
+        (cE PageConfig, {
           co: @props.co
 
-          on_back: @_on_show_page_main
+          on_show_page: @_on_show_page
+          on_back: @_on_back
+          })
+      when 'config_post'
+        (cE PageConfigPost, {
+          co: @props.co
+
+          on_back: @_on_back
+          })
+      when 'data'
+        (cE PageData, {
+          co: @props.co
+
+          on_show_page: @_on_show_page
+          on_show_db: @_on_show_page_db
+          on_back: @_on_back
+          })
+      when 'data_user_symbol2'
+        (cE PageDataUserSymbol2, {
+          co: @props.co
+
+          on_back: @_on_back
           })
       when 'db'
         (cE PageDb, {
           co: @props.co
           no_check_db: @state.no_check_db
 
-          on_back: @_on_show_page_main
+          on_back: @_on_back
           })
-      when 'config'
-        (cE PageConfig, {
+      when 'debug'
+        (cE PageDebug, {
           co: @props.co
 
-          on_back: @_on_show_page_main
+          on_back: @_on_back
           })
       else  # 'main'
         (cE PageMain, {
           co: @props.co
 
-          on_show_debug: @_on_show_page_debug
-          on_show_about: @_on_show_page_about
-          on_show_db: @_on_show_page_db
-          on_show_config: @_on_show_page_config
+          on_show_page: @_on_show_page
           })
 
   render: ->

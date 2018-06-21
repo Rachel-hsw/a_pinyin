@@ -1,6 +1,6 @@
 # config.coffee, a_pinyin/apk/src/
 
-P_VERSION = 'a_pinyin version 1.2.0 test20180604 1147'
+P_VERSION = 'a_pinyin version 1.3.0 test20180621 0900'
 
 CORE_DB_VERSION = '1.0.0'
 

@@ -12,14 +12,14 @@ PropTypes = require 'prop-types'
   Image
 } = require 'react-native'
 
+img = require '../img'
+
+s = require './_style'
 {
   PageTop
-  RightItem
   ScrollPage
-
-  s
-} = require './sub'
-img = require '../img'
+  RightItem
+} = require './_sub'
 
 
 PageMain = cC {
@@ -27,13 +27,23 @@ PageMain = cC {
 
   propTypes: {
     co: PropTypes.object.isRequired
+
     db_ok: PropTypes.bool
 
-    on_show_debug: PropTypes.func.isRequired
-    on_show_about: PropTypes.func.isRequired
-    on_show_db: PropTypes.func.isRequired
-    on_show_config: PropTypes.func.isRequired
+    on_show_page: PropTypes.func.isRequired
   }
+
+  _on_show_about: ->
+    @props.on_show_page 'about'
+
+  _on_show_config: ->
+    @props.on_show_page 'config'
+
+  _on_show_data: ->
+    @props.on_show_page 'data'
+
+  _on_show_debug: ->
+    @props.on_show_page 'debug'
 
   _render_main_logo: ->
     (cE Image, {
@@ -44,11 +54,12 @@ PageMain = cC {
         height: Dimensions.get('window').width
       } })
 
+  # show notice text if not db_ok
   _render_db_button: ->
     sec = ''
     if @props.db_ok is false
       sec = '错误 !'
-    @_render_one_button '数据', @props.on_show_db, sec
+    @_render_one_button '数据', @_on_show_data, sec
 
   _render_one_button: (text, on_click, text_sec) ->
     (cE RightItem, {
@@ -70,17 +81,17 @@ PageMain = cC {
       top: (cE PageTop, {
         co: @props.co
         text: @_get_top_text()
-        on_click: @props.on_show_debug
+        on_click: @_on_show_debug
         })
       },
       @_render_main_logo()
       # gap
       (cE View, { style: s.fill_view })
       # config page
-      @_render_one_button '设置', @props.on_show_config, ''
+      @_render_one_button '设置', @_on_show_config, ''
       @_render_db_button()
       # about button
-      @_render_one_button '关于', @props.on_show_about, ''
+      @_render_one_button '关于', @_on_show_about, ''
     )
 }
 

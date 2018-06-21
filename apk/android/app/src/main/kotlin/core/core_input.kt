@@ -26,7 +26,7 @@ const val USER_DATA_DB_NAME: String = "user_data.db"
 
 // sqlite3: ANALYZE and VACUUM
 fun clean_user_db() {
-    val conn = _open_db_user(USER_DATA_DB)
+    val conn = open_db_user()
     // turn-off transaction
     conn.autoCommit = true
 
@@ -49,13 +49,13 @@ fun get_db_info(): JsonObject {
     var conn: Connection? = null
     var conn_user: Connection? = null
     try {
-        conn = _open_db(CORE_DATA_DB)
+        conn = open_db_core()
         core_db_info = _get_one_db_info(conn)
     } catch (e: Exception) {
         e.printStackTrace()  // ignore error
     }
     try {
-        conn_user = _open_db_user(USER_DATA_DB)
+        conn_user = open_db_user()
         user_db_info = _get_one_db_info(conn_user)
     } catch (e: Exception) {
         e.printStackTrace()  // ignore error
@@ -88,21 +88,26 @@ private fun _get_one_db_info(conn: Connection): JsonArray<Any?> {
     }
 }
 
-private fun _open_db(db_file: String): Connection {
-    println("DEBUG: core_input: open sqlite3 database  ${db_file}")
+private fun _load_db_driver() {
     // load jdbc driver first
     Class.forName("org.sqlite.JDBC")
+}
+
+private fun _open_db(db_file: String): Connection {
+    _load_db_driver()
 
     val conn = DriverManager.getConnection("jdbc:sqlite:${db_file}")
-
     return conn
 }
 
-private fun _open_db_user(db_file: String): Connection {
-    println("DEBUG: core_input: open user database  ${db_file}")
+fun open_db_core(db_file: String = CORE_DATA_DB): Connection {
+    println("DEBUG: core_input: open sqlite3 database  ${db_file}")
+    return _open_db(db_file)
+}
 
-    val conn = DriverManager.getConnection("jdbc:sqlite:${db_file}")
-    return conn
+fun open_db_user(db_file: String = USER_DATA_DB): Connection {
+    println("DEBUG: core_input: open user database  ${db_file}")
+    return _open_db(db_file)
 }
 
 
@@ -141,9 +146,9 @@ class CoreInput {
         // TODO handle init Exception ?
 
         // open databases first
-        val conn = _open_db(CORE_DATA_DB)
+        val conn = open_db_core()
         _conn = conn
-        val conn_user = _open_db_user(USER_DATA_DB)
+        val conn_user = open_db_user()
         _conn_user = conn_user
         // TODO check database (a_pinyin data format) version ?
 

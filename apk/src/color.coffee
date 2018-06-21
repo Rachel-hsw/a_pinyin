@@ -8,94 +8,109 @@
 # main color
 _MC_BLACK = 'hsl(0, 0%, 0%)'
 _MC_WHITE = 'hsl(0, 0%, 100%)'
-_MC_GRAY = 'hsl(0, 0%, 50%)'
+
+_MC_GRAY = 'hsl(0, 0%, 50%)'  # pure gray
+
+# for nolog color
 _MC_BLUE = 'hsl(240, 100%, 80%)'
 _MC_GREEN = 'hsl(120, 100%, 40%)'
 
+# for sec colors
+_MC_GRAY_1 = 'hsl(0, 0%, 30%)'  # dark gray
+_MC_GRAY_2 = 'hsl(0, 0%, 70%)'  # light gray
+
 # create co obj
-_gen_color = (color_bg, color_fg, color_sec, color_nolog) ->
+_gen_color = (mc) ->
+  {
+    color_bg
+    color_fg
+    color_sec_bg
+    color_sec_fg
+    color_nolog
+    color_gray  # FIXME
+  } = mc
+
   {
     # BG color
     BG: color_bg
-    BG_SEC: color_sec
+    BG_SEC: color_sec_bg
 
     # button
-    BG_BTN: color_sec
+    BG_BTN: color_sec_bg
 
     BG_TOUCH: color_fg
 
     # border
-    BORDER: color_sec
+    BORDER: color_sec_bg
 
     # text
     TEXT: color_fg
-    TEXT_SEC: color_sec
+    TEXT_SEC: color_sec_fg
     TEXT_BG: color_bg
 
     # other color
     # todo bg color
     TODO: 'rgb(255, 255, 0)'
 
+    GRAY: color_gray
+
     # nolog mode color
     NOLOG: color_nolog
   }
 
-co_dark = _gen_color _MC_BLACK, _MC_WHITE, _MC_GRAY, _MC_BLUE
-co_light = _gen_color _MC_WHITE, _MC_BLACK, _MC_GRAY, _MC_GREEN
+co_dark = _gen_color {
+  color_bg: _MC_BLACK
+  color_fg: _MC_WHITE
+  color_sec_bg: _MC_GRAY_1
+  color_sec_fg: _MC_GRAY_2
+  color_nolog: _MC_BLUE
+  color_gray: _MC_GRAY
+}
+co_light = _gen_color {
+  color_bg: _MC_WHITE
+  color_fg: _MC_BLACK
+  color_sec_bg: _MC_GRAY_2
+  color_sec_fg: _MC_GRAY  # use light color here
+  color_nolog: _MC_GREEN
+  color_gray: _MC_GRAY
+}
 
 # create color stylesheet
 _gen_co_ss = (co) ->
   o = StyleSheet.create {
     # kb: keyboard color
-    kb_touch_view: {
-      backgroundColor: co.BG
-      borderColor: co.BORDER
+
+    # TouchableCore (View)
+    kb_tc: {
     }
-    kb_touch_view_active: {
+    kb_tc_active: {
       backgroundColor: co.TEXT
     }
-    kb_touch_text: {
+    # SimpleTouch (Text)
+    kb_st: {
       color: co.TEXT
     }
-    kb_touch_text_active: {
-      color: co.TEXT_SEC
+    kb_st_active: {
+      color: co.BG
     }
-
-    border: {
+    # sec button
+    kb_sec: {  # View
       borderColor: co.BORDER
     }
-
-    # kb sec button
-    kb_sec_text: {
+    kb_sec_text: {  # Text
       color: co.TEXT_SEC
     }
-
-    kb_shift_view_active: {
+    # KbShiftButton
+    kb_sb_active: {  # View
       backgroundColor: co.TEXT_SEC
     }
-    kb_shift_text_active: {
+    kb_sb_text_active: {  # Text
       color: co.BG
     }
 
-    # kb_top
-    kb_top_view: {
-      backgroundColor: co.BG
-    }
-    kb_top_view_active: {
-      backgroundColor: co.TEXT_SEC
-    }
-    kb_top_text: {
-      color: co.TEXT_SEC
-    }
-    kb_top_text_active: {
-      color: co.BG
-    }
-    kb_top_text_nolog: {
-      color: co.NOLOG
-    }
-
+    # kb_more
     kb_more_button_view: {
-      backgroundColor: co.BG
+      borderColor: co.BORDER
     }
     kb_more_button_view_active: {
       backgroundColor: co.TEXT_SEC
@@ -114,8 +129,33 @@ _gen_co_ss = (co) ->
       color: co.TEXT
     }
 
+    # kb_top
+    kb_top_view: {
+    }
+    kb_top_view_active: {
+      backgroundColor: co.GRAY
+    }
+    kb_top_text: {
+      color: co.TEXT_SEC
+    }
+    kb_top_text_active: {
+      color: co.BG
+    }
+    kb_top_text_nolog: {
+      color: co.NOLOG
+    }
+    # kb_top_pinyin
+    kb_top_pinyin_right: {  # View
+      backgroundColor: co.BG
+    }
+
+    # the whole keyboard
     keyboard_view: {
       backgroundColor: co.BG
+    }
+
+    border: {
+      borderColor: co.BORDER
     }
     # ui: main UI color
     ui_text: {
@@ -124,12 +164,15 @@ _gen_co_ss = (co) ->
     ui_text_sec: {
       color: co.TEXT_SEC
     }
+    ui_text_bg: {
+      color: co.BG_SEC
+    }
     ui_text_nolog: {
       color: co.NOLOG
     }
     ui_top_view: {
       backgroundColor: co.BG
-      borderBottomColor: co.BG_SEC
+      borderBottomColor: co.BORDER
     }
     ui_license_text: {
       color: co.TEXT
@@ -142,7 +185,7 @@ _gen_co_ss = (co) ->
   # add more
   o.co = co
   # TouchableNativeFeedback.Ripple
-  o.touch_ripple = TouchableNativeFeedback.Ripple co.BG_SEC
+  o.touch_ripple = TouchableNativeFeedback.Ripple co.TEXT_SEC
   o
 
 get_co = (co) ->

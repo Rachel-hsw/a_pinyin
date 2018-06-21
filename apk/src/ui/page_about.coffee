@@ -12,13 +12,11 @@ PropTypes = require 'prop-types'
 } = require 'react-native'
 
 config = require '../config'
-
+s = require './_style'
 {
   PageTop
   ScrollPage
-
-  s
-} = require './sub'
+} = require './_sub'
 
 
 LICENSE_TEXT = '''\
@@ -90,7 +88,7 @@ PageAbout = cC {
           s.about_text
           @props.co.ui_text_sec
         ] },
-        "https://github.com/sceext2/a_pinyin"
+        "https://github.com/sceext-mirror-201806/a_pinyin"
       )
       # license
       (cE Text, {

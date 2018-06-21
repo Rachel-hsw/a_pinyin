@@ -47,25 +47,6 @@ KB_SPACE_BUTTON_FONT_SIZE = 10
 
 # global styles
 ss = StyleSheet.create {
-  kb_view: {
-    marginTop: KB_PAD_V
-    flex: 1
-  }
-  kb_sym_line_view: {
-    flexDirection: 'row'
-    height: KB_SYM_LINE_HEIGHT
-  }
-  kb_scrollview: {
-    flex: 1
-  }
-
-  kb_top_view: {
-    flexShrink: 0
-    height: KB_TOP_HEIGHT
-    borderTopWidth: BORDER_WIDTH
-    flexDirection: 'row'
-  }
-
   keyboard_view: {
     height: KB_HEIGHT
   }
@@ -73,8 +54,6 @@ ss = StyleSheet.create {
     flex: 1
     flexDirection: 'column'
   }
-
-  # TODO
 }
 
 module.exports = {

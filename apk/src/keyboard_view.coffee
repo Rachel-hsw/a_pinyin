@@ -6,13 +6,17 @@ PropTypes = require 'prop-types'
 
 {
   View
-  Text
 
   DeviceEventEmitter
 } = require 'react-native'
 Subscribable = require 'Subscribable'
 
-{ ss } = require './style'
+{
+  KB_TOP_HEIGHT
+  KB_PAD_V
+
+  ss
+} = require './style'
 { get_co } = require './color'
 
 im_native = require './im_native'
@@ -41,6 +45,7 @@ KeyboardView = cC {
     core_nolog: PropTypes.bool.isRequired
     list_symbol: PropTypes.array.isRequired
     list_symbol2: PropTypes.array.isRequired
+    symbol2_measured_width: PropTypes.array.isRequired
 
     on_native_event: PropTypes.func.isRequired
     on_init: PropTypes.func.isRequired
@@ -52,6 +57,7 @@ KeyboardView = cC {
     on_text: PropTypes.func.isRequired
     on_key_delete: PropTypes.func.isRequired
     on_key_enter: PropTypes.func.isRequired
+    on_clip_paste: PropTypes.func.isRequired
 
     on_text_symbol: PropTypes.func.isRequired
     on_text_symbol2: PropTypes.func.isRequired
@@ -63,6 +69,19 @@ KeyboardView = cC {
     {
       kb: 'pinyin'  # current keyboard tab
         # ['more', 'english', 'pinyin', 'number', 'symbol', 'symbol2']
+      layout: null  # layout data for size_x, size_y
+    }
+
+  _onLayout: (evt) ->
+    @setState {
+      layout: evt.nativeEvent.layout
+    }
+
+  _get_body_size: ->
+    # assert: @state.layout != null
+    {
+      size_x: @state.layout.width
+      size_y: @state.layout.height - KB_TOP_HEIGHT
     }
 
   _on_native_event: (raw) ->
@@ -81,9 +100,14 @@ KeyboardView = cC {
     }
 
   _render_pinyin: ->
+    size_x = @state.layout.width
+    size_y = @state.layout.height
+
     (cE KbPinyin, {
       co: @props.co
       vibration_ms: @props.vibration_ms
+      size_x
+      size_y
       layout: @props.layout
       core_nolog: @props.core_nolog
 
@@ -95,7 +119,10 @@ KeyboardView = cC {
     })
 
   _render_kb: ->
-    if @state.kb is 'pinyin'
+    # no render without layout
+    if ! @state.layout?
+      null
+    else if @state.kb is 'pinyin'
       @_render_pinyin()
     else
       [
@@ -113,6 +140,11 @@ KeyboardView = cC {
       ]
 
   _render_body: ->
+    {
+      size_x
+      size_y
+    } = @_get_body_size()
+
     switch @state.kb
       when 'more'
         (cE KbMore, {
@@ -129,6 +161,8 @@ KeyboardView = cC {
         (cE KbEnglish, {
           co: @props.co
           vibration_ms: @props.vibration_ms
+          size_x
+          size_y
           layout: @props.layout
           on_text: @props.on_text
           on_key_delete: @props.on_key_delete
@@ -150,6 +184,8 @@ KeyboardView = cC {
         (cE KbSymbol, {
           co: @props.co
           vibration_ms: @props.vibration_ms
+          size_x
+          size_y
           list: @props.list_symbol
           on_text: @props.on_text_symbol
           reload: @props.reload_symbol
@@ -160,8 +196,12 @@ KeyboardView = cC {
         (cE KbSymbol2, {
           co: @props.co
           vibration_ms: @props.vibration_ms
+          size_x
+          size_y
           list: @props.list_symbol2
+          measured_width: @props.symbol2_measured_width
           on_text: @props.on_text_symbol2
+          on_clip_paste: @props.on_clip_paste
           reload: @props.reload_symbol2
 
           key: 2
@@ -169,6 +209,7 @@ KeyboardView = cC {
 
   render: ->
     (cE View, {
+      onLayout: @_onLayout
       style: [
         ss.keyboard_view
         @props.co.keyboard_view
@@ -184,14 +225,17 @@ action = require './redux/action'
 op = require './redux/op'
 
 mapStateToProps = ($$state, props) ->
+  $$user = $$state.get 'user'
+
   {
     co: get_co $$state.get('co')
     layout: $$state.get 'layout'
     vibration_ms: $$state.getIn ['config', 'vibration_ms']
 
     core_nolog: $$state.getIn ['core', 'nolog']
-    list_symbol: $$state.getIn(['user', 'symbol']).toJS()
-    list_symbol2: $$state.getIn(['user', 'symbol2']).toJS()
+    list_symbol: $$user.get('symbol').toJS()
+    list_symbol2: $$user.get('symbol2').toJS()
+    symbol2_measured_width: $$user.get('measured_width').toJS()
   }
 
 mapDispatchToProps = (dispatch, props) ->
@@ -218,6 +262,8 @@ mapDispatchToProps = (dispatch, props) ->
     dispatch op.key_delete()
   o.on_key_enter = ->
     dispatch op.key_enter()
+  o.on_clip_paste = ->
+    dispatch op.clip_paste()
 
   o.on_text_symbol = (text) ->
     dispatch op.add_text(text, im_native.INPUT_MODE_SYMBOL)

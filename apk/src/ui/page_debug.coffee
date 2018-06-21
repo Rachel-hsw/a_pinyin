@@ -12,12 +12,11 @@ PropTypes = require 'prop-types'
   Button
 } = require 'react-native'
 
+s = require './_style'
 {
   PageTop
   ScrollPage
-
-  s
-} = require './sub'
+} = require './_sub'
 
 
 PageDebug = cC {

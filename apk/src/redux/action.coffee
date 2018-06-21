@@ -18,10 +18,15 @@ CORE_NOLOG_CHANGE = 'core_nolog_change'
 
 USER_SET_SYMBOL = 'user_set_symbol'
 USER_SET_SYMBOL2 = 'user_set_symbol2'
+USER_SET_MEASURED_WIDTH = 'user_set_measured_width'
 
 DB_SET_INFO = 'db_set_info'
 
 UPDATE_CONFIG = 'update_config'
+
+DUS2_LOAD_START = 'dus2_load_start'
+DUS2_LOAD_END = 'dus2_load_end'
+
 
 set_co = (co) ->
   {
@@ -85,6 +90,12 @@ user_set_symbol2 = (data) ->
     payload: data
   }
 
+user_set_measured_width = (payload) ->
+  {
+    type: USER_SET_MEASURED_WIDTH
+    payload
+  }
+
 db_set_info = (payload) ->
   {
     type: DB_SET_INFO
@@ -94,6 +105,17 @@ db_set_info = (payload) ->
 update_config = (payload) ->
   {
     type: UPDATE_CONFIG
+    payload
+  }
+
+dus2_load_start = ->
+  {
+    type: DUS2_LOAD_START
+  }
+
+dus2_load_end = (payload) ->
+  {
+    type: DUS2_LOAD_END
     payload
   }
 
@@ -111,10 +133,14 @@ module.exports = {
 
   USER_SET_SYMBOL
   USER_SET_SYMBOL2
+  USER_SET_MEASURED_WIDTH
 
   DB_SET_INFO
 
   UPDATE_CONFIG
+
+  DUS2_LOAD_START
+  DUS2_LOAD_END
 
   set_co
   reset_ui
@@ -129,8 +155,12 @@ module.exports = {
 
   user_set_symbol
   user_set_symbol2
+  user_set_measured_width
 
   db_set_info
 
   update_config
+
+  dus2_load_start
+  dus2_load_end
 }

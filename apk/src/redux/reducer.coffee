@@ -38,6 +38,8 @@ reducer = ($$state, action) ->
       $$o = $$o.setIn ['user', 'symbol'], Immutable.fromJS(action.payload)
     when ac.USER_SET_SYMBOL2
       $$o = $$o.setIn ['user', 'symbol2'], Immutable.fromJS(action.payload)
+    when ac.USER_SET_MEASURED_WIDTH
+      $$o = $$o.setIn ['user', 'measured_width'], Immutable.fromJS(action.payload)
 
     when ac.DB_SET_INFO
       $$o = $$o.update 'db', ($$d) ->
@@ -46,6 +48,12 @@ reducer = ($$state, action) ->
     when ac.UPDATE_CONFIG
       $$o = $$o.update 'config', ($$c) ->
         $$c.merge Immutable.fromJS(action.payload)
+
+    when ac.DUS2_LOAD_START
+      $$o = $$o.setIn ['dus2', 'is_loading'], true
+    when ac.DUS2_LOAD_END
+      $$o = $$o.setIn ['dus2', 'list'], Immutable.fromJS(action.payload)
+      $$o = $$o.setIn ['dus2', 'is_loading'], false
   $$o
 
 module.exports = reducer

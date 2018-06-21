@@ -4,6 +4,7 @@ path = require 'path'
 
 {
   Alert
+  Clipboard
 } = require 'react-native'
 { default: RNFetchBlob } = require 'react-native-fetch-blob'
 
@@ -12,6 +13,9 @@ util = require '../util'
 
 config = require '../config'
 im_native = require '../im_native'
+{
+  KB_FONT_SIZE
+} = require '../style'
 
 
 close_window = ->
@@ -34,6 +38,15 @@ key_enter = ->
   (dispatch, getState) ->
     await im_native.key_enter()
 
+clip_paste = ->
+  (dispatch, getState) ->
+    s = await Clipboard.getString()
+    if ! s?
+      return  # null string
+    if s.length < 1
+      return  # empty string
+    # input the string from clipboard (paste function)
+    await dispatch add_text(s)  # mode = 0, nolog
 
 # for pinyin input
 
@@ -237,7 +250,17 @@ load_user_symbol = ->
 load_user_symbol2 = ->
   (dispatch, getState) ->
     raw = await im_native.core_get_symbol2()
-    dispatch action.user_set_symbol2(_calc_user_symbol2(raw))
+    symbol2 = _calc_user_symbol2 raw
+    # measure text width
+    $$user = getState().get 'user'
+    width = await _measure_symbol2 {
+      old_symbol2: $$user.get('symbol2').toJS()
+      old_width: $$user.get('measured_width').toJS()
+      symbol2
+    }
+    # update symbol2 and text width
+    dispatch action.user_set_symbol2(symbol2)
+    dispatch action.user_set_measured_width(width)
 
 _calc_user_symbol = (raw) ->
   # default list
@@ -262,6 +285,35 @@ _merge_list = (raw) ->
         o.push j
         d[j] = true
   o
+
+_measure_symbol2 = (args) ->
+  {
+    old_symbol2
+    old_width
+    symbol2
+  } = args
+  # calc with cache
+  cache = {}  # build old cache
+  for i in [0... old_symbol2.length]
+    # assert: old_symbol2.length == old_width.length
+    cache[old_symbol2[i]] = old_width[i]
+  # new items to measure
+  to = []
+  for i in symbol2
+    if ! cache[i]?
+      to.push i
+  # measure text width and merge back to cache
+  if to.length > 0
+    fontSize = KB_FONT_SIZE
+    height = 100  # TODO
+    r = await util.measure_text_width to, fontSize, height
+    for i in [0... to.length]
+      cache[to[i]] = r[i]
+  # gen new output
+  o = []
+  for i in symbol2
+    o.push cache[i]
+  o  # measure width done
 
 # database
 
@@ -430,12 +482,32 @@ exit_app = ->
   (dispatch, getState) ->
     await im_native.exit_app()
 
+# data_user_symbol2
+
+dus2_load = ->
+  (dispatch, getState) ->
+    # TODO error process ?
+    dispatch action.dus2_load_start()
+    result = await im_native.dus2_list()
+    dispatch action.dus2_load_end(result)
+
+dus2_add = (text) ->
+  (dispatch, getState) ->
+    await im_native.dus2_add(text)
+    await dispatch dus2_load()
+
+dus2_rm = (list) ->
+  (dispatch, getState) ->
+    await im_native.dus2_rm(list)
+    await dispatch dus2_load()
+
 module.exports = {
   close_window  # thunk
   add_text  # thunk
   add_text_pinyin  # thunk
   key_delete  # thunk
   key_enter  # thunk
+  clip_paste  # thunk
 
   reset_pinyin  # thunk
   pinyin_add_char  # thunk
@@ -460,4 +532,8 @@ module.exports = {
 
   clean_user_db  # thunk
   exit_app  # thunk
+
+  dus2_load  # thunk
+  dus2_add  # thunk
+  dus2_rm  # thunk
 }
