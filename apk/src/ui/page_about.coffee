@@ -46,6 +46,16 @@ PageAbout = cC {
     on_back: PropTypes.func.isRequired
   }
 
+  _render_sec_text: (text) ->
+    (cE Text, {
+      selectable: true
+      style: [
+        s.about_text
+        @props.co.ui_text_sec
+      ] },
+      text
+    )
+
   render: ->
     (cE ScrollPage, {
       co: @props.co
@@ -56,7 +66,7 @@ PageAbout = cC {
         })
       margin: true
       },
-      # name and page url
+      # name
       (cE Text, {
         selectable: true
         style: [
@@ -65,32 +75,24 @@ PageAbout = cC {
         ] },
         "A拼音: 开源的 Android 拼音输入法"
       )
-      (cE Text, {
-        selectable: true
-        style: [
-          s.about_text
-          @props.co.ui_text_sec
-        ] },
-        config.P_VERSION
-      )
+      # version
+      @_render_sec_text config.P_VERSION
       # URLs for source code
+      @_render_sec_text "https://bitbucket.org/sceext2018/a_pinyin/"
+
+      # mirrors
       (cE Text, {
-        selectable: true
         style: [
           s.about_text
-          @props.co.ui_text_sec
+          @props.co.ui_text
         ] },
-        "https://bitbucket.org/sceext2018/a_pinyin/"
+        '镜像:'
       )
-      (cE Text, {
-        selectable: true
-        style: [
-          s.about_text
-          @props.co.ui_text_sec
-        ] },
-        "https://github.com/sceext-mirror-201806/a_pinyin"
-      )
-      # license
+      @_render_sec_text "https://github.com/sceext-mirror-201806/a_pinyin"
+      @_render_sec_text "https://gitee.com/sceext2133/a_pinyin"
+      @_render_sec_text "https://coding.net/u/sceext2133/p/a_pinyin"
+
+      # LICENSE
       (cE Text, {
         style: [
           s.about_title_text
@@ -98,7 +100,7 @@ PageAbout = cC {
         ] },
         "LICENSE"
       )
-      (cE View, null,  # FIXME not grow
+      (cE View, null,
         (cE ScrollView, {
           horizontal: true
           },

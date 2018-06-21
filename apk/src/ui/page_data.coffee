@@ -33,6 +33,9 @@ PageData = cC {
   _on_show_page_user_symbol2: ->
     @props.on_show_page 'data_user_symbol2'
 
+  _on_show_select_mirror: ->
+    @props.on_show_page 'select_mirror'
+
   # show notice text if not db_ok
   _render_db_button: ->
     text_sec = ''
@@ -45,6 +48,14 @@ PageData = cC {
       text_sec
       on_click: @props.on_show_db
       })
+
+  _render_select_mirror: ->
+    if @props.db_ok is false
+      (cE RightItem, {
+        co: @props.co
+        text: '选择下载镜像'
+        on_click: @_on_show_select_mirror
+        })
 
   render: ->
     (cE ScrollPage, {
@@ -63,6 +74,8 @@ PageData = cC {
         })
       # placeholder
       (cE View, { style: s.fill_view })
+      # select mirror
+      @_render_select_mirror()
       # page db
       @_render_db_button()
     )

@@ -5,6 +5,7 @@ A_RESET_UI = 'a_reset_ui'
 
 A_SET_LAYOUT = 'a_set_layout'
 
+A_SET_DL_MIRROR = 'a_set_dl_mirror'
 
 PINYIN_RESET = 'pinyin_reset'
 PINYIN_SET = 'pinyin_set'
@@ -43,6 +44,12 @@ set_layout = (name) ->
   {
     type: A_SET_LAYOUT
     payload: name
+  }
+
+set_dl_mirror = (payload) ->
+  {
+    type: A_SET_DL_MIRROR
+    payload
   }
 
 pinyin_reset = ->
@@ -123,6 +130,7 @@ module.exports = {
   A_SET_CO
   A_RESET_UI
   A_SET_LAYOUT
+  A_SET_DL_MIRROR
 
   PINYIN_RESET
   PINYIN_SET
@@ -145,6 +153,7 @@ module.exports = {
   set_co
   reset_ui
   set_layout
+  set_dl_mirror
 
   pinyin_reset
   pinyin_set
