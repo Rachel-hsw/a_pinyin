@@ -1,6 +1,6 @@
 # config.coffee, a_pinyin/apk/src/
 
-P_VERSION = 'a_pinyin version 1.3.0 test20180621 0900'
+P_VERSION = 'a_pinyin version 1.3.1 test20180621 2344'
 
 CORE_DB_VERSION = '1.0.0'
 
@@ -20,9 +20,24 @@ PINYIN_MORE_PER_LINE = 6
 DB_CORE_DATA = '/sdcard/a_pinyin/core/core_data.db'
 DB_USER_DATA = '/sdcard/a_pinyin/user/user_data.db'
 
+# URLs to download databases, with mirrors
 DB_REMOTE_URL = {
-  'core_data.db': 'https://bitbucket.org/sceext2018/a_pinyin/raw/db/1.0.0/core_data.db'
-  'user_data.db': 'https://bitbucket.org/sceext2018/a_pinyin/raw/db/1.0.0/user_data.db'
+  'bitbucket.org': {
+    'core_data.db': 'https://bitbucket.org/sceext2018/a_pinyin/raw/db/1.0.0/core_data.db'
+    'user_data.db': 'https://bitbucket.org/sceext2018/a_pinyin/raw/db/1.0.0/user_data.db'
+  }
+  'github.com': {
+    'core_data.db': 'https://github.com/sceext-mirror-201806/a_pinyin/raw/db/1.0.0/core_data.db'
+    'user_data.db': 'https://github.com/sceext-mirror-201806/a_pinyin/raw/db/1.0.0/user_data.db'
+  }
+  'gitee.com': {
+    'core_data.db': 'https://gitee.com/sceext2133/a_pinyin/raw/db/1.0.0/core_data.db'
+    'user_data.db': 'https://gitee.com/sceext2133/a_pinyin/raw/db/1.0.0/user_data.db'
+  }
+  'coding.net': {
+    'core_data.db': 'https://coding.net/u/sceext2133/p/a_pinyin/git/raw/db/1.0.0/core_data.db'
+    'user_data.db': 'https://coding.net/u/sceext2133/p/a_pinyin/git/raw/db/1.0.0/user_data.db'
+  }
 }
 DB_TMP_DIR = '/sdcard/a_pinyin/tmp'
 DB_TMP_SUFFIX = '.tmp'
